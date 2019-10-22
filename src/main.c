@@ -4,7 +4,7 @@
  * main.c ------- All the source code for the parser is in src/parser.y
  *                To run this, type in make to make the binary, then type
  *                  
- *                        bin/slic.exe < filename.in
+ *                        bin/slic.exe < filename.txt
  * 
  * 				  This will generate the parsers output for the given input
  *                file.
@@ -28,12 +28,13 @@ int main()
    	int n;
    	n = yyparse();
 
-   	if (n == 0)
-		printf("Parsing was successful.\n");
-	else 
+   	if (n != 0) {
 		printf("There was an error parsing\n");
+		return -1;
+	}
 
 
+	// Print the contents of the symbol table
 	printf("|%11s|%11s|%11s|%11s|%11s|%11s|\n", "Type", "Name", "Address", "Size", "Structure", "Hash Value");
 	for (int i=0; i < 73; i++) printf("=");
 	printf("\n");
@@ -48,6 +49,7 @@ int main()
 		printf("\n");
 	}
 	
+	// Clean up memory and exit
 	freeSymbolTable();
-   	exit(0);
+   	return 0;
 }

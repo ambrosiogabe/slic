@@ -30,7 +30,6 @@ bison.y:
 	bison ${YACCOPTS} src/parser.y
 
 mkdirs:
-	mkdir -p debug
 	mkdir -p bin
 	mkdir -p src/generated
 
