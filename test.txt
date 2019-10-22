@@ -1,0 +1,11 @@
+main;
+	data:
+		real: some, realVar, vars, withAList[5];
+		integer: more, vars, i;
+		real: singleVar;
+		integer: lastOne[10];
+
+	algorithm:
+
+
+end main;
