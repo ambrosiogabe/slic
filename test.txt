@@ -6,6 +6,6 @@ main;
 		integer: lastOne[10];
 
 	algorithm:
-
+		a := b + c;
 
 end main;

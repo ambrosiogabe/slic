@@ -21,7 +21,7 @@ YACC = bison
 YACCOPTS = -d -y -b src/generated/y 
 
 slic: mkdirs lex.yy.c
-	${CC} -o bin/slic.exe src/generated/lex.yy.c src/generated/y.tab.c src/main.c ${LEXLIB}
+	${CC} -o bin/slic.exe src/symbolTable.c src/generated/lex.yy.c src/generated/y.tab.c src/main.c ${LEXLIB}
 
 lex.yy.c: bison.y
 	${LEX} ${FLEXOPTS} src/scanner.l
@@ -30,6 +30,7 @@ bison.y:
 	bison ${YACCOPTS} src/parser.y
 
 mkdirs:
+	mkdir -p debug
 	mkdir -p bin
 	mkdir -p src/generated
 

@@ -19,17 +19,35 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "symbolTable.h"
 
 int main()
 {
-   	int n;
+	initSymbolTable();
 
+   	int n;
    	n = yyparse();
+
    	if (n == 0)
 		printf("Parsing was successful.\n");
 	else 
 		printf("There was an error parsing\n");
 
-		
+
+	printf("|%11s|%11s|%11s|%11s|%11s|%11s|\n", "Type", "Name", "Address", "Size", "Structure", "Hash Value");
+	for (int i=0; i < 73; i++) printf("=");
+	printf("\n");
+
+	for (int i=0; i < symbolTable.size; i++) {
+		SymbolTableEntry entry = symbolTable.symbols[i];
+		char* type = entry.type == INT ? "integer" : "real";
+		char* structure = entry.structure == SCALAR ? "scalar" : "array"; 
+
+		printf("|%11s|%11s|%11d|%11d|%11s|%11u|\n", type, entry.name, entry.address, entry.size, structure, entry.hashValue);
+		for (int i=0; i < 73; i++) printf("-");
+		printf("\n");
+	}
+	
+	freeSymbolTable();
    	exit(0);
 }

@@ -13,11 +13,15 @@
  */
 
 #include <stdio.h>
+#include "../symbolTable.h"
 
 #define DEBUG_PARSER 0
 
 int yyerror();
 int yylex();
+
+DataType currentType;
+int address = 0;
 
 %}
 
@@ -25,6 +29,8 @@ int yylex();
 
 %union {
    char *sval;
+   int ival;
+   float rval;
 }
 
 %token        MAIN_RW
@@ -71,8 +77,8 @@ int yylex();
 %token        NOT_OP 
 %token        ASSIGN_OP 
 
-%token <sval> REAL_NUMBER
-%token <sval> INTEGER
+%token <rval> REAL_NUMBER
+%token <ival> INTEGER
 %token <sval> VARIABLE
 %token <sval> STRING 
 %token        NEWLINE
@@ -101,8 +107,8 @@ declarationStmtList:
 ;
 
 dataType:
-	  REAL_RW 
-	| INTEGER_RW
+	  REAL_RW {currentType = REAL;}
+	| INTEGER_RW {currentType = INT;}
 ;
 
 declarationList:
@@ -111,8 +117,17 @@ declarationList:
 ;
 
 declarationItem:
-	  VARIABLE                                    {if(DEBUG_PARSER) printf("%s ", $1);}
-	| VARIABLE LEFT_BRACKET INTEGER RIGHT_BRACKET    {if(DEBUG_PARSER) printf("%s[] ", $1);}
+	  VARIABLE                                  {
+		  											if(DEBUG_PARSER) printf("%s ", $1);
+													insertSymbolTable(currentType, $1, address, SCALAR, 1);
+													address++;
+												}
+	| VARIABLE LEFT_BRACKET INTEGER RIGHT_BRACKET    
+												{
+													if(DEBUG_PARSER) printf("%s[] ", $1);
+													insertSymbolTable(currentType, $1, address, ARRAY, $3);
+													address += $3;
+												}
 ;
 
 stmtList:

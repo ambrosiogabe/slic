@@ -229,13 +229,14 @@
 
 (\+|-)?(([0-9]+)\.([0-9]+))((e|E)(\+|-)?[0-9]+)?    {
                                                         if (DEBUG) printf("Token: REAL_NUMBER  %s\n", yytext);
-                                                        yylval.sval = strdup(yytext);
+                                                        char* pend;
+                                                        yylval.rval = strtof(yytext, &pend);
                                                         return(REAL_NUMBER);
                                                     }
 
 [0-9]+                                              {
                                                         if (DEBUG) printf("Token: INTEGER  %s\n", yytext);
-                                                        yylval.sval = strdup(yytext);
+                                                        yylval.ival = atoi(yytext);
                                                         return(INTEGER);
                                                     }
 
