@@ -255,4 +255,8 @@
 (\n)|(\r\n)                                         {
                                                         if (DEBUG) printf("Newline\n");
                                                     }
+
+.                                                   {
+                                                        if (DEBUG) printf("Trash: %s", yytext);
+                                                    }
 %%

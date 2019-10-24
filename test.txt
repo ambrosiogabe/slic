@@ -4,8 +4,3 @@ main;
 		integer: more, vars, i;
 		real: singleVar;
 		integer: lastOne[10];
-
-	algorithm:
-		a := b + c;
-
-end main;

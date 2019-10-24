@@ -16,12 +16,23 @@ CC = gcc
 LEX = flex
 LEXLIB = -lfl   #Cygwin
 FLEXOPTS = -o src/generated/lex.yy.c -I
+CLASS_FLEXOPTS = -I
 
 YACC = bison
 YACCOPTS = -d -y -b src/generated/y 
+CLASS_YACCOPTS = -d -y 
 
-slic: mkdirs lex.yy.c
-	${CC} -o bin/slic.exe src/symbolTable.c src/generated/lex.yy.c src/generated/y.tab.c src/main.c ${LEXLIB}
+slic: classLex.yy.c
+	${CC} -o slic.exe symbolTable.c lex.yy.c y.tab.c main.c ${LEXLIB}
+
+pretty: mkdirs mvFiles lex.yy.c 
+	${CC} -DPRETTY -o bin/slic.exe src/symbolTable.c src/generated/lex.yy.c src/generated/y.tab.c src/main.c ${LEXLIB}
+
+classLex.yy.c: classBison.y
+	${LEX} ${CLASS_FLEXOPTS} scanner.l
+
+classBison.y:
+	bison ${CLASS_YACCOPTS} parser.y
 
 lex.yy.c: bison.y
 	${LEX} ${FLEXOPTS} src/scanner.l
@@ -30,9 +41,18 @@ bison.y:
 	bison ${YACCOPTS} src/parser.y
 
 mkdirs:
+	mkdir -p src
 	mkdir -p bin
 	mkdir -p src/generated
 
+mvFiles:
+	-mv -t src *.c *.h *.y *.l
+
 clean:
+	-rm *.yy.c *.tab.c *.tab.h *.exe
+
+cleanPretty:
 	rm -rf bin
 	rm -rf src/generated
+	-mv src/* ./ 
+	rm -rf src

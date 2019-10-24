@@ -14,8 +14,12 @@
  * ========================================================================
  */
 
-// Generated
-#include "generated/y.tab.h"
+#ifdef PRETTY
+	// Generated
+	#include "generated/y.tab.h"
+#else 
+	#include "y.tab.h"
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -35,8 +39,8 @@ int main()
 
 
 	// Print the contents of the symbol table
-	printf("|%11s|%11s|%11s|%11s|%11s|%11s|\n", "Type", "Name", "Address", "Size", "Structure", "Hash Value");
-	for (int i=0; i < 73; i++) printf("=");
+	printf("|%11s|%11s|%11s|%11s|%11s|\n", "Type", "Name", "Address", "Size", "Structure");
+	for (int i=0; i < 61; i++) printf("=");
 	printf("\n");
 
 	for (int i=0; i < symbolTable.size; i++) {
@@ -44,8 +48,8 @@ int main()
 		char* type = entry.type == INT ? "integer" : "real";
 		char* structure = entry.structure == SCALAR ? "scalar" : "array"; 
 
-		printf("|%11s|%11s|%11d|%11d|%11s|%11u|\n", type, entry.name, entry.address, entry.size, structure, entry.hashValue);
-		for (int i=0; i < 73; i++) printf("-");
+		printf("|%11s|%11s|%11d|%11d|%11s|\n", type, entry.name, entry.address, entry.size, structure);
+		for (int i=0; i < 61; i++) printf("-");
 		printf("\n");
 	}
 	
