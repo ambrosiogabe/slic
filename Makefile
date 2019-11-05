@@ -23,10 +23,10 @@ YACCOPTS = -d -y -b src/generated/y
 CLASS_YACCOPTS = -d -y 
 
 slic: classLex.yy.c
-	${CC} -o slic.exe symbolTable.c lex.yy.c y.tab.c main.c ${LEXLIB}
+	${CC} -o slic.exe symbolTable.c abstractSyntaxTree.c compiler.c lex.yy.c y.tab.c main.c ${LEXLIB}
 
 pretty: mkdirs mvFiles lex.yy.c 
-	${CC} -DPRETTY -o bin/slic.exe src/symbolTable.c src/generated/lex.yy.c src/generated/y.tab.c src/main.c ${LEXLIB}
+	${CC} -DPRETTY -o bin/slic.exe src/symbolTable.c src/abstractSyntaxTree.c src/compiler.c src/generated/lex.yy.c src/generated/y.tab.c src/main.c ${LEXLIB}
 
 classLex.yy.c: classBison.y
 	${LEX} ${CLASS_FLEXOPTS} scanner.l

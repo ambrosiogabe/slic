@@ -52,6 +52,7 @@ SymbolTableEntry getSymbol(char* name);
 
 // A function to generate a hash for a variable, thus reducing
 // the need to do a string comparison when doing lookups.
-unsigned int hashVariableName(char* name);
+unsigned int hashVariableName(char* name); 
+void printSymbolTable();
 
 #endif

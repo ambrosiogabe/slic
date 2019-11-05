@@ -71,21 +71,21 @@ extern int yydebug;
     RIGHT_PAREN = 281,
     LEFT_BRACE = 282,
     RIGHT_BRACE = 283,
-    MULTIPLY_OP = 284,
-    DIVIDE_OP = 285,
-    MINUS_OP = 286,
-    PLUS_OP = 287,
-    MODULUS_OP = 288,
-    LESS_THAN_OP = 289,
-    LESS_THAN_EQUAL_OP = 290,
-    GRT_THAN_OP = 291,
-    GRT_THAN_EQUAL_OP = 292,
-    EQUAL_OP = 293,
-    NOT_EQUAL_OP = 294,
-    AND_OP = 295,
-    OR_OP = 296,
-    NOT_OP = 297,
-    ASSIGN_OP = 298,
+    MULTIPLY_TOKEN = 284,
+    DIVIDE_TOKEN = 285,
+    MINUS_TOKEN = 286,
+    PLUS_TOKEN = 287,
+    MODULUS_TOKEN = 288,
+    LESS_THAN_TOKEN = 289,
+    LESS_THAN_EQUAL_TOKEN = 290,
+    GRT_THAN_TOKEN = 291,
+    GRT_THAN_EQUAL_TOKEN = 292,
+    EQUAL_TOKEN = 293,
+    NOT_EQUAL_TOKEN = 294,
+    AND_TOKEN = 295,
+    OR_TOKEN = 296,
+    NOT_TOKEN = 297,
+    ASSIGN_TOKEN = 298,
     REAL_NUMBER = 299,
     INTEGER = 300,
     VARIABLE = 301,
@@ -120,21 +120,21 @@ extern int yydebug;
 #define RIGHT_PAREN 281
 #define LEFT_BRACE 282
 #define RIGHT_BRACE 283
-#define MULTIPLY_OP 284
-#define DIVIDE_OP 285
-#define MINUS_OP 286
-#define PLUS_OP 287
-#define MODULUS_OP 288
-#define LESS_THAN_OP 289
-#define LESS_THAN_EQUAL_OP 290
-#define GRT_THAN_OP 291
-#define GRT_THAN_EQUAL_OP 292
-#define EQUAL_OP 293
-#define NOT_EQUAL_OP 294
-#define AND_OP 295
-#define OR_OP 296
-#define NOT_OP 297
-#define ASSIGN_OP 298
+#define MULTIPLY_TOKEN 284
+#define DIVIDE_TOKEN 285
+#define MINUS_TOKEN 286
+#define PLUS_TOKEN 287
+#define MODULUS_TOKEN 288
+#define LESS_THAN_TOKEN 289
+#define LESS_THAN_EQUAL_TOKEN 290
+#define GRT_THAN_TOKEN 291
+#define GRT_THAN_EQUAL_TOKEN 292
+#define EQUAL_TOKEN 293
+#define NOT_EQUAL_TOKEN 294
+#define AND_TOKEN 295
+#define OR_TOKEN 296
+#define NOT_TOKEN 297
+#define ASSIGN_TOKEN 298
 #define REAL_NUMBER 299
 #define INTEGER 300
 #define VARIABLE 301
@@ -146,13 +146,14 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 35 "src/parser.y" /* yacc.c:1909  */
+#line 39 "src/parser.y" /* yacc.c:1909  */
 
-   char *sval;
+   char* sval;
    int ival;
    float rval;
+   AstNode* node;
 
-#line 156 "src/generated/y.tab.h" /* yacc.c:1909  */
+#line 157 "src/generated/y.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

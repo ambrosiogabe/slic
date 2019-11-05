@@ -14,6 +14,10 @@
  * ========================================================================
  */
 
+#include "symbolTable.h"
+#include "abstractSyntaxTree.h"
+#include "compiler.h"
+
 #ifdef PRETTY
 	// Generated
 	#include "generated/y.tab.h"
@@ -23,37 +27,57 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "symbolTable.h"
+
+void gstalPrintSymbol(SymbolTableEntry entry) {
+	int curAddress = entry.address;
+
+	for (char* c = entry.name; *c != '\0'; c++) {
+		printf("LLI %d\n", *c);
+		printf("PTC\n");
+	}
+	printf("LLI %d\n", ':');
+	printf("PTC\n");
+	printf("LLI %d\nPTC\n", ' ');
+
+	for (int i=0; i < entry.size; i++) {
+		printf("LAA %d\n", curAddress);
+		if (entry.type == REAL)
+			printf("LOD\nPTF\n");
+		else 
+			printf("LOD\nPTI\n");
+
+		if (i != entry.size - 1)
+			printf("LLI %d\nPTC\nLLI %d\nPTC\n", ',', ' ');
+		curAddress++;
+	}
+	printf("PTL\n");
+}
+
+void gstalPrintAllSymbols() {
+	for (int i=0; i < symbolTable.size; i++) {
+		gstalPrintSymbol(symbolTable.symbols[i]);
+	}
+}
 
 int main()
 {
 	initSymbolTable();
+	initSyntaxTree();
 
    	int n;
    	n = yyparse();
 
    	if (n != 0) {
-		printf("There was an error parsing\n");
+		printf("There was an error parsing::main.c\n");
 		return -1;
 	}
 
+	//printSymbolTable();
+	walkSyntaxTree();
+	gstalPrintAllSymbols();
 
-	// Print the contents of the symbol table
-	printf("|%11s|%11s|%11s|%11s|%11s|\n", "Type", "Name", "Address", "Size", "Structure");
-	for (int i=0; i < 61; i++) printf("=");
-	printf("\n");
-
-	for (int i=0; i < symbolTable.size; i++) {
-		SymbolTableEntry entry = symbolTable.symbols[i];
-		char* type = entry.type == INT ? "integer" : "real";
-		char* structure = entry.structure == SCALAR ? "scalar" : "array"; 
-
-		printf("|%11s|%11s|%11d|%11d|%11s|\n", type, entry.name, entry.address, entry.size, structure);
-		for (int i=0; i < 61; i++) printf("-");
-		printf("\n");
-	}
-	
 	// Clean up memory and exit
+	freeAst();
 	freeSymbolTable();
    	return 0;
 }

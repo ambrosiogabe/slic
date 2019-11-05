@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "symbolTable.h"
 
@@ -10,6 +11,9 @@ void initSymbolTable() {
 }
 
 void freeSymbolTable() {
+    for (int i=0; i < symbolTable.size; i++) {
+        free(symbolTable.symbols[i].name);
+    }
     free(symbolTable.symbols);
 }
 
@@ -43,6 +47,9 @@ SymbolTableEntry getSymbol(char* name) {
             return symbolTable.symbols[i];
         }
     }
+    
+    printf("Error: Symbol '%s' not declared.", name);
+    exit(-1);
 }
 
 unsigned int hashVariableName(char* name) {
@@ -51,4 +58,21 @@ unsigned int hashVariableName(char* name) {
             hash = (hash * 31) + (int)*c;
     }
     return hash;
+}
+
+void printSymbolTable() {
+    // Print the contents of the symbol table
+	printf("|%11s|%11s|%11s|%11s|%11s|\n", "Type", "Name", "Address", "Size", "Structure");
+	for (int i=0; i < 61; i++) printf("=");
+	printf("\n");
+
+	for (int i=0; i < symbolTable.size; i++) {
+		SymbolTableEntry entry = symbolTable.symbols[i];
+		char* type = entry.type == INT ? "integer" : "real";
+		char* structure = entry.structure == SCALAR ? "scalar" : "array"; 
+
+		printf("|%11s|%11s|%11d|%11d|%11s|\n", type, entry.name, entry.address, entry.size, structure);
+		for (int i=0; i < 61; i++) printf("-");
+		printf("\n");
+	}
 }

@@ -8,6 +8,12 @@
     * ======================================================================*/
     #define DEBUG 0
 
+    #ifdef PRETTY
+        #include "../abstractSyntaxTree.h"
+    #else 
+        #include "abstractSyntaxTree.h"
+    #endif
+
     // Generated
     #include "y.tab.h"
 
@@ -149,78 +155,78 @@
                                                     }
 
 "*"                                                 {
-                                                        if (DEBUG) printf("Token: MULTIPLY_OP %s\n", yytext);
-                                                        return(MULTIPLY_OP);
+                                                        if (DEBUG) printf("Token: MULTIPLY_TOKEN %s\n", yytext);
+                                                        return(MULTIPLY_TOKEN);
                                                     }
 
 "/"                                                 {
-                                                        if (DEBUG) printf("Token: DIVIDE_OP %s\n", yytext);
-                                                        return(DIVIDE_OP);
+                                                        if (DEBUG) printf("Token: DIVIDE_TOKEN %s\n", yytext);
+                                                        return(DIVIDE_TOKEN);
                                                     }
 
 "-"                                                 {
-                                                        if (DEBUG) printf("Token: MINUS_OP %s\n", yytext);
-                                                        return(MINUS_OP);
+                                                        if (DEBUG) printf("Token: MINUS_TOKEN %s\n", yytext);
+                                                        return(MINUS_TOKEN);
                                                     }
 
 "+"                                                 {
-                                                        if (DEBUG) printf("Token: ADD_OP %s\n", yytext);
-                                                        return(PLUS_OP);
+                                                        if (DEBUG) printf("Token: ADD_TOKEN %s\n", yytext);
+                                                        return(PLUS_TOKEN);
                                                     }
 
 "%"                                                 {
-                                                        if (DEBUG) printf("Token: MODULUS_OP %s\n", yytext);
-                                                        return(MODULUS_OP);
+                                                        if (DEBUG) printf("Token: MODULUS_TOKEN %s\n", yytext);
+                                                        return(MODULUS_TOKEN);
                                                     }
 
 "<"                                                 {
-                                                        if (DEBUG) printf("Token: LESS_THAN_OP %s\n", yytext);
-                                                        return(LESS_THAN_OP);
+                                                        if (DEBUG) printf("Token: LESS_THAN_TOKEN %s\n", yytext);
+                                                        return(LESS_THAN_TOKEN);
                                                     }
 
 "<="                                                {
-                                                        if (DEBUG) printf("Token: LESS_THAN_EQUAL_OP %s\n", yytext);
-                                                        return(LESS_THAN_EQUAL_OP);
+                                                        if (DEBUG) printf("Token: LESS_THAN_EQUAL_TOKEN %s\n", yytext);
+                                                        return(LESS_THAN_EQUAL_TOKEN);
                                                     }
 
 ">"                                                 {
-                                                        if (DEBUG) printf("Token: GRT_THAN_OP %s\n", yytext);
-                                                        return(GRT_THAN_OP);
+                                                        if (DEBUG) printf("Token: GRT_THAN_TOKEN %s\n", yytext);
+                                                        return(GRT_THAN_TOKEN);
                                                     }
 
 ">="                                                {
-                                                        if (DEBUG) printf("Token: GRT_THAN_EQUAL_OP %s\n", yytext);
-                                                        return(GRT_THAN_EQUAL_OP);
+                                                        if (DEBUG) printf("Token: GRT_THAN_EQUAL_TOKEN %s\n", yytext);
+                                                        return(GRT_THAN_EQUAL_TOKEN);
                                                     }
 
 "="                                                 {
-                                                        if (DEBUG) printf("Token: EQUAL_OP %s\n", yytext);
-                                                        return(EQUAL_OP);
+                                                        if (DEBUG) printf("Token: EQUAL_TOKEN %s\n", yytext);
+                                                        return(EQUAL_TOKEN);
                                                     }
 
 "<>"                                                {
-                                                        if (DEBUG) printf("Token: NOT_EQUAL_OP %s\n", yytext);
-                                                        return(NOT_EQUAL_OP);
+                                                        if (DEBUG) printf("Token: NOT_EQUAL_TOKEN %s\n", yytext);
+                                                        return(NOT_EQUAL_TOKEN);
                                                     }
 
 "&"                                                 {
-                                                        if (DEBUG) printf("Token: AND_OP %s\n", yytext);
-                                                        return(AND_OP);
+                                                        if (DEBUG) printf("Token: AND_TOKEN %s\n", yytext);
+                                                        return(AND_TOKEN);
                                                     }
 
 "|"                                                 {
-                                                        if (DEBUG) printf("Token: OR_OP %s\n", yytext);
-                                                        return(OR_OP);
+                                                        if (DEBUG) printf("Token: OR_TOKEN %s\n", yytext);
+                                                        return(OR_TOKEN);
                                                     }
 
 "~"                                                 {
-                                                        if (DEBUG) printf("Token: NOT_OP %s\n", yytext);
-                                                        return(NOT_OP);
+                                                        if (DEBUG) printf("Token: NOT_TOKEN %s\n", yytext);
+                                                        return(NOT_TOKEN);
                                                     }
 
 ":="                                                {
-                                                        if (DEBUG) printf("Token: ASSIGN_OP %s\n", yytext);
-                                                        return(ASSIGN_OP);
+                                                        if (DEBUG) printf("Token: ASSIGN_TOKEN %s\n", yytext);
+                                                        return(ASSIGN_TOKEN);
                                                     }
          
 #(.*)                                               {
