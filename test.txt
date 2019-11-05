@@ -4,12 +4,9 @@ main;
 		integer: someOtherVariable;
 	algorithm:
 		someOtherVariable := -1;
-		i := 0;
-		a[i] := 20;
-		a[i + 1] := a[i] + someOtherVariable;
-		a[1 + 5] := 2;
-
-		a[3] := a[0] <> a[1];
-		a[2] := ~2;
+		i := i + 1;
+		i := i + 1;
+		i := i + 1;
+		i := i * 10;
 
 end main;

@@ -1,11 +1,23 @@
+/* ==============================================================
+/* This file contains all of the implementations for the header,
+/* as well as several static functions that are meant to be 
+/* helpers private to this file.
+/*
+/* Author: Gabe Ambrosio
+/* ============================================================== */
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "compiler.h"
 
+
+/* ==============================================================
+/* Helper methods to walk individual nodes of the AST and 
+/* output GSTAL code.
+/* ============================================================== */
+static int isFloatExpr = 0;
 static void walkNode(AstNode* node);
 static void walkVariableNode(AstNode* node, int loadVal);
-static int isFloatExpr = 0;
 
 static void walkAssignmentNode(AstNode* node) {
     walkVariableNode(node->as.assignStmt->variableNode, 0);
@@ -89,10 +101,19 @@ static void walkExprNode(AstNode* node) {
     isFloatExpr = 0;
 }
 
+
+/* ==============================================================
+/* Initialization function
+/* ============================================================== */
 void initSyntaxTree() {
     astRootNode = NULL;
 }
 
+/* ==============================================================
+/* Function to walk the whole tree. It simply starts walking 
+/* the rootNode, and continues to walk the next nodes until
+/* there are no nodes left to walk.
+/* ============================================================== */
 void walkSyntaxTree() {
     if (astRootNode == NULL) {
         printf("Error: No syntax tree generated!");
@@ -112,6 +133,10 @@ void walkSyntaxTree() {
     }
 }
 
+/* ==============================================================
+/* Master helper function that determines which function 
+/* to call depending on what type of AstNode it is dealing with
+/* ============================================================== */
 static void walkNode(AstNode* node) {
     switch(node->type) {
         case ASSIGN_STMT_NODE:

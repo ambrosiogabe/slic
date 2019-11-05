@@ -28,6 +28,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// Helper functions to output GSTAL code
+// to print contents of symbol table after
+// execution of program.
 void gstalPrintSymbol(SymbolTableEntry entry) {
 	int curAddress = entry.address;
 

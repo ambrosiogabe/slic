@@ -1,6 +1,18 @@
+/* ==============================================================
+/* This file contains the implementation for abstractSyntaxTree.h
+/* See that file for more information about the functions and 
+/* structs.
+/* 
+/* Author: Gabe Ambrosio
+/* ============================================================== */
+
 #include "compiler.h"
 #include "abstractSyntaxTree.h"
 
+
+/* ==============================================================
+/* All the functions to create AstNodes
+/* ============================================================== */
 AstNode* makeAssignmentNode(char* name, AstNode* expr) {
     if (!IS_TYPE_OF_EXPR(*expr)) {
         printf("Error: You can only assign an expression to a variable!");
@@ -102,7 +114,6 @@ AstNode* makeArrayLoadNode(char* name, AstNode* indexExpr) {
 
     return newNode;
 }
-
 
 
 

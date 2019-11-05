@@ -1,3 +1,11 @@
+/* ==============================================================================
+/* Implementation of symbolTable.h. See symbolTable.h for more details on 
+/* specifics.
+/* 
+/* Programmer: Gabe Ambrosio
+/* 
+/* ============================================================================== */
+
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -61,7 +69,6 @@ unsigned int hashVariableName(char* name) {
 }
 
 void printSymbolTable() {
-    // Print the contents of the symbol table
 	printf("|%11s|%11s|%11s|%11s|%11s|\n", "Type", "Name", "Address", "Size", "Structure");
 	for (int i=0; i < 61; i++) printf("=");
 	printf("\n");
