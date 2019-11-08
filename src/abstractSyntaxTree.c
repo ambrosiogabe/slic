@@ -13,15 +13,16 @@
 /* ==============================================================
 /* All the functions to create AstNodes
 /* ============================================================== */
-AstNode* makeAssignmentNode(char* name, AstNode* expr) {
+AstNode* makeAssignmentNode(int tokenInfoIndex, char* name, AstNode* expr) {
     if (!IS_TYPE_OF_EXPR(*expr)) {
         printf("Error: You can only assign an expression to a variable!");
         exit(-1);
     }
 
     AstNode* newNode = malloc(sizeof(AstNode));
+    newNode->tokenInfoIndex = tokenInfoIndex;
     newNode->type = ASSIGN_STMT_NODE;
-    AstNode* varNode = makeVariableNode(name);
+    AstNode* varNode = makeVariableNode(tokenInfoIndex, name);
     newNode->as.assignStmt = malloc(sizeof(AssignStmt));
     newNode->as.assignStmt->variableNode = varNode;
     newNode->as.assignStmt->exprNode = expr;
@@ -29,15 +30,16 @@ AstNode* makeAssignmentNode(char* name, AstNode* expr) {
     return newNode;
 }
 
-AstNode* makeArrayAssignmentNode(char* name, AstNode* indexExpr, AstNode* valExpr) {
+AstNode* makeArrayAssignmentNode(int tokenInfoIndex, char* name, AstNode* indexExpr, AstNode* valExpr) {
     if (!IS_TYPE_OF_EXPR(*indexExpr) || !IS_TYPE_OF_EXPR(*valExpr)) {
         printf("Error: You can only use expressions as indices in arrays, or as values to assign to arrays!");
         exit(-1);
     }
 
     AstNode* newNode = malloc(sizeof(AstNode));
+    newNode->tokenInfoIndex = tokenInfoIndex;
     newNode->type = ARRAY_ASSIGN_STMT_NODE;
-    AstNode* varNode = makeVariableNode(name);
+    AstNode* varNode = makeVariableNode(tokenInfoIndex, name);
     newNode->as.arrayAssignStmt = malloc(sizeof(ArrayAssignStmt));
     newNode->as.arrayAssignStmt->variableNode = varNode;
     newNode->as.arrayAssignStmt->indexExpr = indexExpr;
@@ -46,8 +48,9 @@ AstNode* makeArrayAssignmentNode(char* name, AstNode* indexExpr, AstNode* valExp
     return newNode;
 }
 
-AstNode* makeExprNode(ExprOp op, AstNode* leftExpr, AstNode* rightExpr) {
+AstNode* makeExprNode(int tokenInfoIndex, ExprOp op, AstNode* leftExpr, AstNode* rightExpr) {
     AstNode* newNode = malloc(sizeof(AstNode));
+    newNode->tokenInfoIndex = tokenInfoIndex;
     newNode->type = EXPR_NODE;
     newNode->as.expression = malloc(sizeof(Expr));
     newNode->as.expression->op = op;
@@ -62,8 +65,9 @@ AstNode* makeExprNode(ExprOp op, AstNode* leftExpr, AstNode* rightExpr) {
     return newNode;
 }
 
-AstNode* makeUnaryExprNode(ExprOp op, AstNode* expr) {
+AstNode* makeUnaryExprNode(int tokenInfoIndex, ExprOp op, AstNode* expr) {
     AstNode* newNode = malloc(sizeof(AstNode));
+    newNode->tokenInfoIndex = tokenInfoIndex;
     newNode->type = UNARY_EXPR_NODE;
     newNode->as.unaryExpr = malloc(sizeof(UnaryExpr));
     newNode->as.unaryExpr->op = op;
@@ -72,8 +76,9 @@ AstNode* makeUnaryExprNode(ExprOp op, AstNode* expr) {
     return newNode;
 }
 
-AstNode* makeFloatValueNode(float value) {
+AstNode* makeFloatValueNode(int tokenInfoIndex, float value) {
     AstNode* newNode = malloc(sizeof(AstNode));
+    newNode->tokenInfoIndex = tokenInfoIndex;
     newNode->type = VALUE_NODE;
     newNode->as.value = malloc(sizeof(Value));
 
@@ -83,8 +88,9 @@ AstNode* makeFloatValueNode(float value) {
     return newNode;
 }
 
-AstNode* makeIntValueNode(int value) {
+AstNode* makeIntValueNode(int tokenInfoIndex, int value) {
     AstNode* newNode = malloc(sizeof(AstNode));
+    newNode->tokenInfoIndex = tokenInfoIndex;
     newNode->type = VALUE_NODE;
     newNode->as.value = malloc(sizeof(Value));
 
@@ -94,18 +100,20 @@ AstNode* makeIntValueNode(int value) {
     return newNode;
 }
 
-AstNode* makeVariableNode(char* name) {
+AstNode* makeVariableNode(int tokenInfoIndex, char* name) {
     SymbolTableEntry symEntry = getSymbol(name);
     AstNode* newNode = malloc(sizeof(AstNode));
+    newNode->tokenInfoIndex = tokenInfoIndex;
     newNode->type = VARIABLE_NODE;
     newNode->as.variable = symEntry;
 
     return newNode;
 }
 
-AstNode* makeArrayLoadNode(char* name, AstNode* indexExpr) {
+AstNode* makeArrayLoadNode(int tokenInfoIndex, char* name, AstNode* indexExpr) {
     SymbolTableEntry symEntry = getSymbol(name);
     AstNode* newNode = malloc(sizeof(AstNode));
+    newNode->tokenInfoIndex = tokenInfoIndex;
     newNode->type = ARRAY_LOAD_NODE;
     newNode->as.arrayLoad = malloc(sizeof(ArrayLoad));
 

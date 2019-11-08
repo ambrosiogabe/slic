@@ -146,14 +146,12 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 39 "src/parser.y" /* yacc.c:1909  */
+#line 43 "src/parser.y" /* yacc.c:1909  */
 
-   char* sval;
-   int ival;
-   float rval;
    AstNode* node;
+   TokenHelper helper;
 
-#line 157 "src/generated/y.tab.h" /* yacc.c:1909  */
+#line 155 "src/generated/y.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

@@ -10,8 +10,10 @@
 
     #ifdef PRETTY
         #include "../abstractSyntaxTree.h"
+        #include "../common.h"
     #else 
         #include "abstractSyntaxTree.h"
+        #include "common.h"
     #endif
 
     // Generated
@@ -236,30 +238,33 @@
 (\+|-)?(([0-9]+)\.([0-9]+))((e|E)(\+|-)?[0-9]+)?    {
                                                         if (DEBUG) printf("Token: REAL_NUMBER  %s\n", yytext);
                                                         char* pend;
-                                                        yylval.rval = strtof(yytext, &pend);
+                                                        yylval.helper.rval = strtof(yytext, &pend);
                                                         return(REAL_NUMBER);
                                                     }
 
 [0-9]+                                              {
                                                         if (DEBUG) printf("Token: INTEGER  %s\n", yytext);
-                                                        yylval.ival = atoi(yytext);
+                                                        yylval.helper.ival = atoi(yytext);
                                                         return(INTEGER);
                                                     }
 
 ([a-zA-Z])([a-zA-Z0-9]*)                            {
                                                         if (DEBUG) printf("Token: VARIABLE  %s\n", yytext);
-                                                        yylval.sval = strdup(yytext);
+                                                        yylval.helper.sval = strdup(yytext);
                                                         return(VARIABLE);
                                                     }
 
 \"(([^\"]*)(\"\")?)*\"                              {
                                                         if (DEBUG) printf("Token: STRING  %s\n", yytext);
-                                                        yylval.sval = strdup(yytext);
+                                                        yylval.helper.sval = strdup(yytext);
                                                         return(STRING);
                                                     }
 
 (\n)|(\r\n)                                         {
                                                         if (DEBUG) printf("Newline\n");
+                                                        incrementLinePointer();
+                                                        currentLineNumber++;
+                                                        currentColumn = 0;
                                                     }
 
 .                                                   {

@@ -144,6 +144,7 @@ typedef struct {
 /* ===========================================================================*/
 struct AstNode {
     NodeType type;
+    int tokenInfoIndex;
     union {
         AssignStmt* assignStmt;
         ArrayAssignStmt* arrayAssignStmt;
@@ -171,14 +172,14 @@ struct AstNode {
 /* Helper functions to make specific nodes for the abstract syntax tree.
 /* The functions are split for each different type of node.
 /* ===========================================================================*/
-AstNode* makeAssignmentNode(char* name, AstNode* expr);
-AstNode* makeArrayAssignmentNode(char* name, AstNode* indexExpr, AstNode* valExpr);
-AstNode* makeExprNode(ExprOp op, AstNode* leftExpr, AstNode* rightExpr);
-AstNode* makeUnaryExprNode(ExprOp op, AstNode* expr);
-AstNode* makeFloatValueNode(float value);
-AstNode* makeIntValueNode(int value);
-AstNode* makeVariableNode(char* name);
-AstNode* makeArrayLoadNode(char* name, AstNode* indexExpr);
+AstNode* makeAssignmentNode(int tokenInfoIndex, char* name, AstNode* expr);
+AstNode* makeArrayAssignmentNode(int tokenInfoIndex, char* name, AstNode* indexExpr, AstNode* valExpr);
+AstNode* makeExprNode(int tokenInfoIndex, ExprOp op, AstNode* leftExpr, AstNode* rightExpr);
+AstNode* makeUnaryExprNode(int tokenInfoIndex, ExprOp op, AstNode* expr);
+AstNode* makeFloatValueNode(int tokenInfoIndex, float value);
+AstNode* makeIntValueNode(int tokenInfoIndex, int value);
+AstNode* makeVariableNode(int tokenInfoIndex, char* name);
+AstNode* makeArrayLoadNode(int tokenInfoIndex, char* name, AstNode* indexExpr);
 
 /* ===========================================================================
 /* A function to free all the memory used for the AST.

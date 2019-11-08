@@ -56,8 +56,9 @@ SymbolTableEntry getSymbol(char* name) {
         }
     }
     
-    printf("Error: Symbol '%s' not declared.", name);
-    exit(-1);
+    SymbolTableEntry badEntry;
+    badEntry.address = 65535;
+    return badEntry;
 }
 
 unsigned int hashVariableName(char* name) {
