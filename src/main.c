@@ -1,13 +1,8 @@
 /*
  * ========================================================================
  * 
- * main.c ------- All the source code for the parser is in src/parser.y
- *                To run this, type in make to make the binary, then type
- *                  
- *                        bin/slic.exe < filename.txt
- * 
- * 				  This will generate the parsers output for the given input
- *                file.
+ * main.c ------- The main program to run the compiler. All the methods
+ *                are in the appropriate files.
  * 
  * Programmer --- Gabe Ambrosio
  * 
@@ -124,6 +119,7 @@ static void init(int argc, char** argv) {
 
 int main(int argc, char** argv)
 {
+	// Initialize everything
 	init(argc, argv);
 	initTokenInformationTable();
 	initSymbolTable();
@@ -131,12 +127,10 @@ int main(int argc, char** argv)
 
    	int n;
    	n = yyparse();
-
    	if (n != 0) {
 		return -1;
 	}
 
-	//printSymbolTable();
 	walkSyntaxTree();
 	gstalPrintAllSymbols();
 

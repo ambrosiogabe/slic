@@ -1,3 +1,9 @@
+/*=================================================================
+/* Implementation of common.h. See common.h for more information.
+/*
+/* Programmer: Gabe Ambrosio
+/*================================================================= */
+
 #include <stdlib.h>
 
 #include "common.h"

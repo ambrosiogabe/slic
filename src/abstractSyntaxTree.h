@@ -139,12 +139,15 @@ typedef struct {
 /* subclasses are denoted by the union and the type.
 /*
 /* @NodeType type: The type of node this node is (ArrayLoad, Value, etc)
+/* @int tokenInfoIndex: The index of this token in the TokenTable for error tracking
+/* @int isFloaty: Whether or not this node could be holding floating point values
 /* @union as: The pointer to the node
 /* @AstNode* next: the pointer to the next statement 
 /* ===========================================================================*/
 struct AstNode {
     NodeType type;
     int tokenInfoIndex;
+    int isFloaty;
     union {
         AssignStmt* assignStmt;
         ArrayAssignStmt* arrayAssignStmt;

@@ -3,12 +3,9 @@ main;
 		integer: a[10], i;
 		integer: id;
 		integer: someOtherVariable;
+		real: realVar;
 	algorithm:
-		someOtherVariable := -1;
-		id := 0;
-		i := id + 1;
-		i := i + 1;
-		i := i + 1;
-		i := i * 10;
+		a[0] := 5.6;
+		a[1] := 5.3 * 2.4 + 7.4 - 5 + 0.88;
 
 end main;

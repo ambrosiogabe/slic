@@ -7,6 +7,7 @@
 /* ============================================================== */
 
 #include "compiler.h"
+#include "common.h"
 #include "abstractSyntaxTree.h"
 
 
@@ -15,7 +16,7 @@
 /* ============================================================== */
 AstNode* makeAssignmentNode(int tokenInfoIndex, char* name, AstNode* expr) {
     if (!IS_TYPE_OF_EXPR(*expr)) {
-        printf("Error: You can only assign an expression to a variable!");
+        yyerrorInfo("You can only assign an expression to a variable!", tokenTable.table[expr->tokenInfoIndex]);
         exit(-1);
     }
 
@@ -26,13 +27,18 @@ AstNode* makeAssignmentNode(int tokenInfoIndex, char* name, AstNode* expr) {
     newNode->as.assignStmt = malloc(sizeof(AssignStmt));
     newNode->as.assignStmt->variableNode = varNode;
     newNode->as.assignStmt->exprNode = expr;
+    newNode->isFloaty = newNode->as.assignStmt->variableNode->as.variable.type == REAL;
 
     return newNode;
 }
 
 AstNode* makeArrayAssignmentNode(int tokenInfoIndex, char* name, AstNode* indexExpr, AstNode* valExpr) {
-    if (!IS_TYPE_OF_EXPR(*indexExpr) || !IS_TYPE_OF_EXPR(*valExpr)) {
-        printf("Error: You can only use expressions as indices in arrays, or as values to assign to arrays!");
+    if (!IS_TYPE_OF_EXPR(*indexExpr)) {
+        yyerrorInfo("You can only use expressions as indices in arrays!", tokenTable.table[indexExpr->tokenInfoIndex]);
+        exit(-1);
+    }
+    if (!IS_TYPE_OF_EXPR(*valExpr)) {
+        yyerrorInfo("You can only assign expressions to variables!", tokenTable.table[valExpr->tokenInfoIndex]);
         exit(-1);
     }
 
@@ -44,6 +50,7 @@ AstNode* makeArrayAssignmentNode(int tokenInfoIndex, char* name, AstNode* indexE
     newNode->as.arrayAssignStmt->variableNode = varNode;
     newNode->as.arrayAssignStmt->indexExpr = indexExpr;
     newNode->as.arrayAssignStmt->valExpr = valExpr;
+    newNode->isFloaty = newNode->as.arrayAssignStmt->variableNode->as.variable.type == REAL;
 
     return newNode;
 }
@@ -54,9 +61,10 @@ AstNode* makeExprNode(int tokenInfoIndex, ExprOp op, AstNode* leftExpr, AstNode*
     newNode->type = EXPR_NODE;
     newNode->as.expression = malloc(sizeof(Expr));
     newNode->as.expression->op = op;
+    newNode->isFloaty = leftExpr->isFloaty | rightExpr->isFloaty;
 
     if (!IS_TYPE_OF_EXPR(*leftExpr) || !IS_TYPE_OF_EXPR(*rightExpr)) {
-        printf("Error: You can only have a variable, value, or expression inside an expression!");
+        yyerrorInfo("You can only have a variable, literal, or expression inside an expression!", tokenTable.table[leftExpr->tokenInfoIndex]);
         exit(-1);
     }
     newNode->as.expression->leftExpr = leftExpr;
@@ -72,6 +80,7 @@ AstNode* makeUnaryExprNode(int tokenInfoIndex, ExprOp op, AstNode* expr) {
     newNode->as.unaryExpr = malloc(sizeof(UnaryExpr));
     newNode->as.unaryExpr->op = op;
     newNode->as.unaryExpr->expr = expr;
+    newNode->isFloaty = expr->isFloaty;
 
     return newNode;
 }
@@ -84,6 +93,7 @@ AstNode* makeFloatValueNode(int tokenInfoIndex, float value) {
 
     newNode->as.value->type = REAL;
     newNode->as.value->as.rVal = value;
+    newNode->isFloaty = 1;
 
     return newNode;
 }
@@ -96,6 +106,7 @@ AstNode* makeIntValueNode(int tokenInfoIndex, int value) {
 
     newNode->as.value->type = INT;
     newNode->as.value->as.iVal = value;
+    newNode->isFloaty = 0;
 
     return newNode;
 }
@@ -106,6 +117,7 @@ AstNode* makeVariableNode(int tokenInfoIndex, char* name) {
     newNode->tokenInfoIndex = tokenInfoIndex;
     newNode->type = VARIABLE_NODE;
     newNode->as.variable = symEntry;
+    newNode->isFloaty = symEntry.type == REAL;
 
     return newNode;
 }
@@ -116,6 +128,7 @@ AstNode* makeArrayLoadNode(int tokenInfoIndex, char* name, AstNode* indexExpr) {
     newNode->tokenInfoIndex = tokenInfoIndex;
     newNode->type = ARRAY_LOAD_NODE;
     newNode->as.arrayLoad = malloc(sizeof(ArrayLoad));
+    newNode->isFloaty = symEntry.type == REAL;
 
     newNode->as.arrayLoad->symEntry = symEntry;
     newNode->as.arrayLoad->indexExpr = indexExpr;

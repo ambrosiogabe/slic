@@ -7,6 +7,7 @@
 /* ============================================================== */
 #include <stdio.h>
 #include <stdlib.h>
+#include "common.h"
 
 #include "compiler.h"
 
@@ -15,41 +16,59 @@
 /* Helper methods to walk individual nodes of the AST and 
 /* output GSTAL code.
 /* ============================================================== */
-static int isFloatExpr = 0;
 static void walkNode(AstNode* node);
 static void walkVariableNode(AstNode* node, int loadVal);
 
 static void walkAssignmentNode(AstNode* node) {
     walkVariableNode(node->as.assignStmt->variableNode, 0);
     walkNode(node->as.assignStmt->exprNode);
+
+    if (!node->as.assignStmt->exprNode->isFloaty && node->as.assignStmt->variableNode->isFloaty) {
+        printf("ITF\n");
+    } else if (node->as.assignStmt->exprNode->isFloaty && !node->as.assignStmt->variableNode->isFloaty) {
+        printf("FTI\n");
+    }
+
     printf("STO\n");
 }
 
 static void walkArrayAssignmentNode(AstNode* node) {
     walkVariableNode(node->as.arrayAssignStmt->variableNode, 0);
     walkNode(node->as.arrayAssignStmt->indexExpr);
+
+    if (node->as.arrayAssignStmt->indexExpr->isFloaty) {
+        printf("FTI\n");
+    }
+
     printf("ADI\n");
     walkNode(node->as.arrayAssignStmt->valExpr);
+
+    if (!node->as.arrayAssignStmt->valExpr->isFloaty && node->as.arrayAssignStmt->variableNode->isFloaty) {
+        printf("ITF\n");
+    } else if (node->as.arrayAssignStmt->valExpr->isFloaty && !node->as.arrayAssignStmt->variableNode->isFloaty) {
+        printf("FTI\n");
+    }
+
     printf("STO\n");
 }
 
 static void walkArrayLoadNode(AstNode* node) {
     printf("LAA %d\n", node->as.arrayLoad->symEntry.address);
     walkNode(node->as.arrayLoad->indexExpr);
+
+    if (node->as.arrayAssignStmt->indexExpr->isFloaty) {
+        printf("FTI\n");
+    }
+
     printf("ADI\n");
     printf("LOD\n");
 }
 
 static void walkValueNode(AstNode* node) {
-    if (node->as.value->type == REAL) {
-        isFloatExpr = 1;
+    if (node->isFloaty) {
         printf("LLF %f\n", node->as.value->as.rVal);
-    } else if (node->as.value->type == INT) {
-        isFloatExpr = 0;
-        printf("LLI %d\n", node->as.value->as.iVal);
     } else {
-        printf("Error: Unkown value node!");
-        exit(-1);
+        printf("LLI %d\n", node->as.value->as.iVal);
     }
 }
 
@@ -60,8 +79,13 @@ static void walkVariableNode(AstNode* node, int loadVal) {
 }
 
 static void walkUnaryNode(AstNode* node) {
-    isFloatExpr = 0;
+    int isFloatExpr = node->isFloaty;
     walkNode(node->as.unaryExpr->expr);
+    if (!node->as.unaryExpr->expr->isFloaty && isFloatExpr) {
+        printf("ITF\n");
+    } else if (node->as.unaryExpr->expr->isFloaty && !isFloatExpr) {
+        printf("FTI\n");
+    }
 
     char* op;
     switch (node->as.unaryExpr->op) {
@@ -69,13 +93,29 @@ static void walkUnaryNode(AstNode* node) {
         case NOT_OP:     op = isFloatExpr ? "LLF 0.0\nEQF" : "LLI 0\nEQI"; break;
     }
     printf("%s\n", op);
-    isFloatExpr = 0;
 }
 
 static void walkExprNode(AstNode* node) {
-    isFloatExpr = 0;
+    int isFloatExpr = node->isFloaty;
     walkNode(node->as.expression->leftExpr);
+
+    if (node->as.expression->leftExpr->isFloaty && !isFloatExpr && node->as.expression->op != MODULUS_OP) {
+        printf("FTI\n");
+    } else if (!node->as.expression->leftExpr->isFloaty && isFloatExpr && node->as.expression->op != MODULUS_OP) {
+        printf("ITF\n");
+    } else if (node->as.expression->leftExpr->isFloaty && node->as.expression->op == MODULUS_OP) {
+        printf("FTI\n");
+    }
+
     walkNode(node->as.expression->rightExpr);
+
+    if (node->as.expression->rightExpr->isFloaty && !isFloatExpr && node->as.expression->op != MODULUS_OP) {
+        printf("FTI\n");
+    } else if (!node->as.expression->rightExpr->isFloaty && isFloatExpr && node->as.expression->op != MODULUS_OP) {
+        printf("ITF\n");
+    } else if (node->as.expression->rightExpr->isFloaty && node->as.expression->op == MODULUS_OP) {
+        printf("FTI\n");
+    }
     
     char* op;
     switch (node->as.expression->op) {
@@ -85,8 +125,15 @@ static void walkExprNode(AstNode* node) {
         case DIVIDE_OP:           op = isFloatExpr ? "DVF" : "DVI"; break;
         case MODULUS_OP:          {
             walkNode(node->as.expression->leftExpr);
+            if (node->as.expression->leftExpr->isFloaty) {
+                printf("FTI\n");
+            }
             walkNode(node->as.expression->rightExpr);
+            if (node->as.expression->rightExpr->isFloaty) {
+                printf("FTI\n");
+            }
             op = "DVI\nMLI\nSBI";
+            node->isFloaty = 0;
             break;
         }
         case GRT_THAN_OP:         op = isFloatExpr ? "GTF" : "GTI"; break;
@@ -95,10 +142,9 @@ static void walkExprNode(AstNode* node) {
         case LESS_THAN_EQUAL_OP:  op = isFloatExpr ? "LEF" : "LEI"; break;
         case EQUAL_OP:            op = isFloatExpr ? "EQF" : "EQI"; break;
         case NOT_EQUAL_OP:        op = isFloatExpr ? "NEF" : "NEI"; break;
-        default:                  op = "Error: Unkown operator"; exit(-1);
+        default:                  yyerrorInfo("Error: Unknown binary operator!", tokenTable.table[node->tokenInfoIndex]); exit(-1);
     }
     printf("%s\n", op);
-    isFloatExpr = 0;
 }
 
 
@@ -116,7 +162,7 @@ void initSyntaxTree() {
 /* ============================================================== */
 void walkSyntaxTree() {
     if (astRootNode == NULL) {
-        printf("Error: No syntax tree generated!");
+        yyerrorInfo("Error: No syntax tree generated! You may have an empty data and algorithm section.", tokenTable.table[0]);
         exit(-1);
     }
 
