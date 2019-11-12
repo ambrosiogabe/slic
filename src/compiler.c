@@ -90,7 +90,7 @@ static void walkUnaryNode(AstNode* node) {
     char* op;
     switch (node->as.unaryExpr->op) {
         case MINUS_OP:   op = isFloatExpr ? "NGF" : "NGI"; break;
-        case NOT_OP:     op = isFloatExpr ? "LLF 0.0\nEQF" : "LLI 0\nEQI"; break;
+        case NOT_OP:     op = isFloatExpr ? "LLF 0.0\nEQF" : "LLI 0\nEQI"; node->isFloaty = 0; break;
     }
     printf("%s\n", op);
 }
@@ -107,6 +107,11 @@ static void walkExprNode(AstNode* node) {
         printf("FTI\n");
     }
 
+    if (node->as.expression->op == OR_OP || node->as.expression->op == AND_OP) {
+        printf("LLI 0\n");
+        printf("NEI\n");
+    }
+
     walkNode(node->as.expression->rightExpr);
 
     if (node->as.expression->rightExpr->isFloaty && !isFloatExpr && node->as.expression->op != MODULUS_OP) {
@@ -115,6 +120,11 @@ static void walkExprNode(AstNode* node) {
         printf("ITF\n");
     } else if (node->as.expression->rightExpr->isFloaty && node->as.expression->op == MODULUS_OP) {
         printf("FTI\n");
+    }
+
+    if (node->as.expression->op == OR_OP || node->as.expression->op == AND_OP) {
+        printf("LLI 0\n");
+        printf("NEI\n");
     }
     
     char* op;
@@ -142,6 +152,20 @@ static void walkExprNode(AstNode* node) {
         case LESS_THAN_EQUAL_OP:  op = isFloatExpr ? "LEF" : "LEI"; break;
         case EQUAL_OP:            op = isFloatExpr ? "EQF" : "EQI"; break;
         case NOT_EQUAL_OP:        op = isFloatExpr ? "NEF" : "NEI"; break;
+        case AND_OP: {
+            printf("MLI\n");
+            printf("LLI 0\n");
+            op = "NEI";
+            node->isFloaty = 0;
+            break;
+        }
+        case OR_OP: {
+            printf("ADI\n");
+            printf("LLI 0\n");
+            op = "NEI";
+            node->isFloaty = 0;
+            break;
+        }
         default:                  yyerrorInfo("Error: Unknown binary operator!", tokenTable.table[node->tokenInfoIndex]); exit(-1);
     }
     printf("%s\n", op);
