@@ -14,6 +14,17 @@
 /* ==============================================================
 /* All the functions to create AstNodes
 /* ============================================================== */
+AstNode* makeIfStatement(AstNode* ifBlock, AstNode* ifCondition, AstNode* elseBlock) {
+    AstNode* newNode = malloc(sizeof(AstNode));
+    newNode->type = IF_STMT_NODE;
+    newNode->as.ifStmt = malloc(sizeof(IfStmt));
+    newNode->as.ifStmt->ifBlock = ifBlock;
+    newNode->as.ifStmt->conditionStatement = ifCondition;
+    newNode->as.ifStmt->elseBlock = elseBlock;
+
+    return newNode;
+}
+
 AstNode* makeAssignmentNode(int tokenInfoIndex, char* name, AstNode* expr) {
     if (!IS_TYPE_OF_EXPR(*expr)) {
         yyerrorInfo("You can only assign an expression to a variable!", tokenTable.table[expr->tokenInfoIndex]);
@@ -73,6 +84,24 @@ AstNode* makeExprNode(int tokenInfoIndex, ExprOp op, AstNode* leftExpr, AstNode*
     return newNode;
 }
 
+AstNode* makePrintExpr(int tokenIndex, AstNode* expr) {
+    AstNode* newNode = malloc(sizeof(AstNode));
+    newNode->type = PRINT_EXPRESSION_NODE;
+    newNode->as.printExpr = malloc(sizeof(PrintExpr));
+    newNode->as.printExpr->printExpr = expr;
+
+    return newNode;
+}
+
+AstNode* makePrintListNode(int tokenInfoIndex, AstNode* firstItem) {
+    AstNode* newNode = malloc(sizeof(AstNode));
+    newNode->type = PRINT_LIST_NODE;
+    newNode->as.printList = malloc(sizeof(PrintListNode));
+    newNode->as.printList->firstItem = firstItem;
+
+    return newNode;
+}
+
 AstNode* makeUnaryExprNode(int tokenInfoIndex, ExprOp op, AstNode* expr) {
     AstNode* newNode = malloc(sizeof(AstNode));
     newNode->tokenInfoIndex = tokenInfoIndex;
@@ -108,6 +137,23 @@ AstNode* makeIntValueNode(int tokenInfoIndex, int value) {
     newNode->as.value->as.iVal = value;
     newNode->isFloaty = 0;
 
+    return newNode;
+}
+
+AstNode* makeStringNode(int tokenInfoIndex, char* string) {
+    AstNode* newNode = malloc(sizeof(AstNode));
+    newNode->tokenInfoIndex = tokenInfoIndex;
+    newNode->type = STRING_VALUE_NODE;
+    newNode->as.string = string;
+
+    return newNode;
+}
+
+AstNode* makeNewlineNode(int tokenInfoIndex) {
+    AstNode* newNode = malloc(sizeof(AstNode));
+    newNode->tokenInfoIndex = tokenInfoIndex;
+    newNode->type = NEWLINE_NODE;
+    
     return newNode;
 }
 
@@ -149,6 +195,11 @@ static void freeUnaryExprNode(AstNode* node);
 static void freeAssignmentStatement(AstNode* node);
 static void freeArrayAssignmentStatement(AstNode* node);
 static void freeArrayLoadNode(AstNode* node);
+static void freeIfStmtNode(AstNode* node);
+static void freeStringNode(AstNode* node);
+static void freeNewlineNode(AstNode* node);
+static void freePrintExprNode(AstNode* node);
+static void freePrintListNode(AstNode* node);
 
 static void freeNode(AstNode* node) {
     switch(node->type) {
@@ -173,6 +224,21 @@ static void freeNode(AstNode* node) {
         case ARRAY_LOAD_NODE:
             freeArrayLoadNode(node);
             break;
+        case IF_STMT_NODE:
+            freeIfStmtNode(node);
+            break;
+        case STRING_VALUE_NODE:
+            freeStringNode(node);
+            break;
+        case NEWLINE_NODE:
+            freeNewlineNode(node);
+            break;
+        case PRINT_EXPRESSION_NODE:
+            freePrintExprNode(node);
+            break;
+        case PRINT_LIST_NODE:
+            freePrintListNode(node);
+            break;
         default:
             printf("Do not know how to free memory for: %d", node->type);
             break;
@@ -190,6 +256,35 @@ void freeAst() {
         freeNode(currentNode);
         currentNode = currentNode->next;
     }
+}
+
+static void freePrintListNode(AstNode* node) {
+    AstNode* current = node->as.printList->firstItem;
+    while (current != NULL) {
+        freeNode(current);
+        current = current->next;
+    }
+
+    free(node->as.printList);
+    free(node);
+}
+
+static void freeIfStmtNode(AstNode* node) {
+    freeNode(node->as.ifStmt->conditionStatement);
+    freeNode(node->as.ifStmt->ifBlock);
+    freeNode(node->as.ifStmt->elseBlock);
+    free(node->as.ifStmt);
+
+    free(node);
+}
+
+static void freeStringNode(AstNode* node) {
+    free(node->as.string);
+    free(node);
+}
+
+static void freeNewlineNode(AstNode* node) {
+    free(node);
 }
 
 static void freeVariableNode(AstNode* node) {
@@ -225,6 +320,12 @@ static void freeExprNode(AstNode* node) {
     freeNode(expr->rightExpr);
 
     free(expr);
+}
+
+static void freePrintExprNode(AstNode* node) {
+    freeNode(node->as.printExpr->printExpr);
+    free(node->as.printExpr);
+    free(node);
 }
 
 static void freeUnaryExprNode(AstNode* node) {

@@ -23,10 +23,15 @@ typedef enum {
     ASSIGN_STMT_NODE,
     ARRAY_ASSIGN_STMT_NODE,
     EXPR_NODE,
+    PRINT_EXPRESSION_NODE,
+    PRINT_LIST_NODE,
     UNARY_EXPR_NODE,
     VALUE_NODE,
+    STRING_VALUE_NODE,
+    NEWLINE_NODE,
     VARIABLE_NODE,
-    ARRAY_LOAD_NODE
+    ARRAY_LOAD_NODE,
+    IF_STMT_NODE
 } NodeType;
 
 /* ===========================================================================
@@ -135,6 +140,28 @@ typedef struct {
 } ArrayLoad;
 
 /* ===========================================================================
+/* The ArrayLoad node contains the branches for loading array variables
+/* in the middle of an expression.
+/*
+/* @SymbolTableEntry symEntry: The variables entry in the symbol table
+/* @AstNode* indexExpr: The pointer to the expression for the index
+/*       e.g a[i + 2] where 'i + 2' is the index expression
+/* ===========================================================================*/
+typedef struct {
+    AstNode* ifBlock;
+    AstNode* conditionStatement;
+    AstNode* elseBlock;
+} IfStmt;
+
+typedef struct {
+    AstNode* firstItem;
+} PrintListNode;
+
+typedef struct {
+    AstNode* printExpr;
+} PrintExpr;
+
+/* ===========================================================================
 /* The AstNode is the "parent" class of all other node subclasses. The node
 /* subclasses are denoted by the union and the type.
 /*
@@ -149,13 +176,17 @@ struct AstNode {
     int tokenInfoIndex;
     int isFloaty;
     union {
+        IfStmt* ifStmt;
         AssignStmt* assignStmt;
         ArrayAssignStmt* arrayAssignStmt;
         Expr* expression;
         UnaryExpr* unaryExpr;
         Value* value;
         ArrayLoad* arrayLoad;
+        PrintListNode* printList;
         SymbolTableEntry variable;
+        PrintExpr* printExpr;
+        char* string;
     } as; 
     AstNode* next;
 };
@@ -178,11 +209,16 @@ struct AstNode {
 AstNode* makeAssignmentNode(int tokenInfoIndex, char* name, AstNode* expr);
 AstNode* makeArrayAssignmentNode(int tokenInfoIndex, char* name, AstNode* indexExpr, AstNode* valExpr);
 AstNode* makeExprNode(int tokenInfoIndex, ExprOp op, AstNode* leftExpr, AstNode* rightExpr);
+AstNode* makePrintExpr(int tokenInfoIndex, AstNode* expr);
 AstNode* makeUnaryExprNode(int tokenInfoIndex, ExprOp op, AstNode* expr);
 AstNode* makeFloatValueNode(int tokenInfoIndex, float value);
 AstNode* makeIntValueNode(int tokenInfoIndex, int value);
 AstNode* makeVariableNode(int tokenInfoIndex, char* name);
+AstNode* makeStringNode(int tokenInfoIndex, char* string);
+AstNode* makeNewlineNode(int tokenInfoIndex);
 AstNode* makeArrayLoadNode(int tokenInfoIndex, char* name, AstNode* indexExpr);
+AstNode* makeIfStatement(AstNode* ifBlock, AstNode* ifCondition, AstNode* elseBlock);
+AstNode* makePrintListNode(int tokenInfoIndex, AstNode* firstItem);
 
 /* ===========================================================================
 /* A function to free all the memory used for the AST.

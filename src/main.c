@@ -25,40 +25,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-// Helper functions to output GSTAL code
-// to print contents of symbol table after
-// execution of program.
-void gstalPrintSymbol(SymbolTableEntry entry) {
-	int curAddress = entry.address;
-
-	for (char* c = entry.name; *c != '\0'; c++) {
-		printf("LLI %d\n", *c);
-		printf("PTC\n");
-	}
-	printf("LLI %d\n", ':');
-	printf("PTC\n");
-	printf("LLI %d\nPTC\n", ' ');
-
-	for (int i=0; i < entry.size; i++) {
-		printf("LAA %d\n", curAddress);
-		if (entry.type == REAL)
-			printf("LOD\nPTF\n");
-		else 
-			printf("LOD\nPTI\n");
-
-		if (i != entry.size - 1)
-			printf("LLI %d\nPTC\nLLI %d\nPTC\n", ',', ' ');
-		curAddress++;
-	}
-	printf("PTL\n");
-}
-
-void gstalPrintAllSymbols() {
-	for (int i=0; i < symbolTable.size; i++) {
-		gstalPrintSymbol(symbolTable.symbols[i]);
-	}
-}
-
 /* ===============================================================================
 /*	Function to create a buffer from user input through cat (<) or from file
 /*  input by the user.
@@ -121,6 +87,7 @@ int main(int argc, char** argv)
 {
 	// Initialize everything
 	init(argc, argv);
+	initInstructionContainer();
 	initTokenInformationTable();
 	initSymbolTable();
 	initSyntaxTree();
@@ -132,10 +99,10 @@ int main(int argc, char** argv)
 	}
 
 	walkSyntaxTree();
-	gstalPrintAllSymbols();
 
 	// Clean up memory and exit
-	freeAst();
+	freeInstructionContainer();
+	//freeAst();
 	freeSymbolTable();
 	free(sourceCode);
    	return 0;

@@ -235,7 +235,7 @@
                                                         if (DEBUG) printf("Token: COMMENT  %s\n", yytext);
                                                     }
 
-(\+|-)?(([0-9]+)\.([0-9]+))((e|E)(\+|-)?[0-9]+)?    {
+(([0-9]+)\.([0-9]+))((e|E)(\+|-)?[0-9]+)?           {
                                                         if (DEBUG) printf("Token: REAL_NUMBER  %s\n", yytext);
                                                         char* pend;
                                                         yylval.helper.rval = strtof(yytext, &pend);

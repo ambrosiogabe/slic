@@ -1,7 +1,17 @@
 main;
 	data:
-		real: truth;
+		integer: age;
+		real: floater;
 	algorithm:
-		truth := ~-1;
+		floater := 12.3;
+
+		if floater > 12;
+			age := 13;
+		else;
+			age := 2;
+		end if;
+
+		print "age ", age, !;
+		print "age ", "is";
 
 end main;

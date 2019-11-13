@@ -96,6 +96,8 @@ static int previousTokenIndex = 0;
 %token          NEWLINE
 
 %type <node> stmt;
+%type <node> stmtList;
+%type <node> blockStmtList;
 %type <node> expr;
 %type <node> assignStmt;
 %type <node> boolTerm;
@@ -103,7 +105,11 @@ static int previousTokenIndex = 0;
 %type <node> term;
 %type <node> unary;
 %type <node> factor;
-%type <node> stmtList;
+%type <node> printItem;
+%type <node> printList;
+%type <node> printExpr;
+%type <node> ifStmt;
+%type <node> elseBlock;
 
 %%
 
@@ -194,8 +200,45 @@ stmtList:
 				}
 ;
 
+blockStmtList: 
+	  stmt blockStmtList 	{ 
+		  						$$ = $1; 
+								$$->next = $2;
+							}
+	| stmt               	{ 
+								$$ = $1; 
+								$$->next = NULL;
+							}
+;
+
 stmt: 
-	assignStmt {$$ = $1;}
+	  assignStmt                   { $$ = $1; }
+	| ifStmt                       { $$ = $1; }
+	| PRINT_RW printList SEMICOLON { $$ = makePrintListNode($2->tokenInfoIndex, $2); }
+;
+
+printList:
+	  printItem COMMA printList { $$ = $1; $$->next = $3; }
+	| printItem                 { $$ = $1; $$->next = NULL; }
+;
+
+printItem:
+	  printExpr { $$ = $1; }
+	| STRING    { $$ = makeStringNode($1.tokenIndex, $1.sval); }
+	| BANG      { $$ = makeNewlineNode($1.tokenIndex); }
+;
+
+printExpr:
+	expr { $$ = makePrintExpr($1->tokenInfoIndex, $1); }
+;
+
+ifStmt:
+	  IF_RW expr SEMICOLON blockStmtList elseBlock END_RW IF_RW SEMICOLON { $$ = makeIfStatement($4, $2, $5); }
+	| IF_RW expr SEMICOLON blockStmtList END_RW IF_RW SEMICOLON           { $$ = makeIfStatement($4, $2, NULL); }
+;
+
+elseBlock:
+	ELSE_RW SEMICOLON blockStmtList { $$ = $3; }
 ;
 
 assignStmt:
