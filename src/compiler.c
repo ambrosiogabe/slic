@@ -70,6 +70,29 @@ static void walkNode(AstNode* node);
 static void walkVariableNode(AstNode* node, int loadVal);
 static void generateCode();
 
+static void walkCountingLoop(AstNode* node) {
+    // Initialize the variable to start expression
+    // and the generated variable to end expression
+    walkNode(node->as.countingLoop->synthesizedAssignment);
+    walkNode(node->as.countingLoop->synthesizedEndValue);
+
+    // Keep track of top of loop and walk checking expression
+    int topOfLoop = instructions.size;
+    walkNode(node->as.countingLoop->synthesizedCheckExpr);
+    int jmpToBottomLoop = instructions.size;
+    insertIntInstruction(JPF, -1);
+
+    AstNode* current = node->as.countingLoop->body;
+    while (current != NULL) {
+        walkNode(current);
+        current = current->next;
+    }
+    walkNode(node->as.countingLoop->synthesizedIncrement);
+    insertIntInstruction(JMP, topOfLoop);
+
+    instructions.instructions[jmpToBottomLoop].operand.ival = instructions.size;
+}
+
 static void walkWhileLoop(AstNode* node) {
     int topOfLoop = instructions.size;
     walkNode(node->as.whileLoop->conditionExpression);
@@ -378,6 +401,9 @@ static void walkNode(AstNode* node) {
             break;
         case WHILE_LOOP_NODE:
             walkWhileLoop(node);
+            break;
+        case COUNTING_LOOP_NODE:
+            walkCountingLoop(node);
             break;
         default:
             printf("Do not know how to walk this! %d", node->type);

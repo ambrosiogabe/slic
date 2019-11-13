@@ -193,9 +193,10 @@ typedef struct {
 
 typedef struct {
     AstNode* variable;
-    int isUpward;
-    AstNode* startExpr;
-    AstNode* endExpr;
+    AstNode* synthesizedIncrement;
+    AstNode* synthesizedCheckExpr;
+    AstNode* synthesizedAssignment;
+    AstNode* synthesizedEndValue;
     AstNode* body;
 } CountingLoop;
 

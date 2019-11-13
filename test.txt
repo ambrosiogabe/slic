@@ -1,20 +1,20 @@
 main;
 	data:
-		integer: age;
-		real: floater;
+		integer: a, b, c;
 
 	algorithm:
-		age := 0;
+		a := 0;
+		b := 1;
+		c := 2;
 
-		while age < 10;
-			age := age + 1;
-			
-			if age > 5;
-				print "age: ", age, !;
-				age := age + 1;
+		counting a downward c * 4 to b - 5;
+			if a % 2 = 0;
+				print "a is ", a, !; # This is a comment
+			else;
+				print "a is odd, that's gross", !;
 			end if;
-		end while;
+		end counting;
 
-		print "Age ", age;
+		print "Done", !;
 
 end main;

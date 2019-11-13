@@ -8,8 +8,11 @@
 
 #include "compiler.h"
 #include "common.h"
+#include <stdio.h>
+#include <stdlib.h>
 #include "abstractSyntaxTree.h"
 
+static void freeNode(AstNode* node);
 
 /* ==============================================================
 /* All the functions to create AstNodes
@@ -19,12 +22,35 @@ AstNode* makeCountingLoopNode(int tokenInfoIndex, AstNode* variable, int isUpwar
     newNode->type = COUNTING_LOOP_NODE;
     newNode->tokenInfoIndex = tokenInfoIndex;
     
+    // Initialize easy stuff
     newNode->as.countingLoop = malloc(sizeof(CountingLoop));
     newNode->as.countingLoop->variable = variable;
-    newNode->as.countingLoop->isUpward = isUpward;
-    newNode->as.countingLoop->startExpr = startExpr;
-    newNode->as.countingLoop->endExpr = endExpr;
     newNode->as.countingLoop->body = body;
+
+    // Synthesize an assignment of the start expression to the variable
+    newNode->as.countingLoop->synthesizedAssignment = makeAssignmentNode(variable->tokenInfoIndex, variable->as.variable.name, startExpr);
+
+    // Create a valueOne node containing 1, or -1, for incrementing or decrementing the variable
+    AstNode* valueOne = NULL;
+    if (isUpward) valueOne = makeIntValueNode(tokenInfoIndex, 1);
+    else          valueOne = makeIntValueNode(tokenInfoIndex, -1);
+
+    // Synthesize an add operation to increment or decrement variable in the loop
+    AstNode* addOperation = makeExprNode(tokenInfoIndex, PLUS_OP, variable, valueOne);
+    newNode->as.countingLoop->synthesizedIncrement = makeAssignmentNode(variable->tokenInfoIndex, variable->as.variable.name, addOperation);
+
+    // Create a variable to hold the endExpression value and insert in symbol table
+    char* varBuffer = malloc(sizeof(char) * 10);
+    snprintf(varBuffer, sizeof(char) * 10, "%d", tokenInfoIndex);
+    insertSymbolTable(INT, varBuffer, symbolTable.size, SCALAR, 1);
+    AstNode* newVariable = makeVariableNode(tokenInfoIndex, varBuffer);
+
+    // Synthesize an assignment to that variable, and a check if the startVariable is greater than this variable
+    newNode->as.countingLoop->synthesizedEndValue = makeAssignmentNode(tokenInfoIndex, newVariable->as.variable.name, endExpr);
+    if (isUpward)
+        newNode->as.countingLoop->synthesizedCheckExpr = makeExprNode(tokenInfoIndex, LESS_THAN_EQUAL_OP, variable, newVariable);
+    else 
+        newNode->as.countingLoop->synthesizedCheckExpr = makeExprNode(tokenInfoIndex, GRT_THAN_EQUAL_OP, variable, newVariable);
 
     return newNode;
 }
@@ -227,6 +253,7 @@ static void freeNewlineNode(AstNode* node);
 static void freePrintExprNode(AstNode* node);
 static void freePrintListNode(AstNode* node);
 static void freeWhileLoop(AstNode* node);
+static void freeCountingLoop(AstNode* node);
 
 static void freeNode(AstNode* node) {
     switch(node->type) {
@@ -268,6 +295,9 @@ static void freeNode(AstNode* node) {
             break;
         case WHILE_LOOP_NODE:
             freeWhileLoop(node);
+            break;
+        case COUNTING_LOOP_NODE:
+            freeCountingLoop(node);
             break;
         default:
             printf("Do not know how to free memory for: %d", node->type);
@@ -312,6 +342,24 @@ static void freeWhileLoop(AstNode* node) {
     }
 
     free(node->as.whileLoop);
+    free(node);
+    node = NULL;
+}
+
+static void freeCountingLoop(AstNode* node) {
+    freeNode(node->as.countingLoop->synthesizedIncrement);
+    freeNode(node->as.countingLoop->synthesizedAssignment);
+    freeNode(node->as.countingLoop->synthesizedEndValue);
+    freeNode(node->as.countingLoop->synthesizedCheckExpr->as.expression->rightExpr);
+
+    AstNode* current = node->as.countingLoop->body;
+    while (current != NULL) {
+        AstNode* tmp = current->next;
+        freeNode(current);
+        current = tmp;
+    }
+
+    free(node->as.countingLoop);
     free(node);
     node = NULL;
 }
