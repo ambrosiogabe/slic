@@ -70,18 +70,43 @@ static void walkNode(AstNode* node);
 static void walkVariableNode(AstNode* node, int loadVal);
 static void generateCode();
 
+static void walkWhileLoop(AstNode* node) {
+    int topOfLoop = instructions.size;
+    walkNode(node->as.whileLoop->conditionExpression);
+    int jmpPastLoopBody = instructions.size;
+    insertIntInstruction(JPF, -1);
+
+    AstNode* current = node->as.whileLoop->whileBlock;
+    while (current != NULL) {
+        walkNode(current);
+        current = current->next;
+    }
+    insertIntInstruction(JMP, topOfLoop);
+
+    instructions.instructions[jmpPastLoopBody].operand.ival = instructions.size;
+}
+
 static void walkIfStmtNode(AstNode* node) {
     walkNode(node->as.ifStmt->conditionStatement);
     int jmpPastIf = instructions.size;
     insertIntInstruction(JPF, -1);
-    walkNode(node->as.ifStmt->ifBlock);
+
+    AstNode* current = node->as.ifStmt->ifBlock;
+    while (current != NULL) {
+        walkNode(current);
+        current = current->next;
+    }
 
     if (node->as.ifStmt->elseBlock != NULL) {
         int jmpPastElse = instructions.size;
         insertIntInstruction(JMP, -1);
         instructions.instructions[jmpPastIf].operand.ival = instructions.size;
 
-        walkNode(node->as.ifStmt->elseBlock);
+        current = node->as.ifStmt->elseBlock;
+        while (current != NULL) {
+            walkNode(current);
+            current = current->next;
+        }
         instructions.instructions[jmpPastElse].operand.ival = instructions.size;
     } else {
         instructions.instructions[jmpPastIf].operand.ival = instructions.size;
@@ -305,6 +330,7 @@ void walkSyntaxTree() {
         walkNode(currentNode);
         currentNode = currentNode->next;
     }
+    insertEmptyInstruction(HLT);
     generateCode();
 }
 
@@ -349,6 +375,9 @@ static void walkNode(AstNode* node) {
             break;
         case PRINT_LIST_NODE:
             walkPrintListNode(node);
+            break;
+        case WHILE_LOOP_NODE:
+            walkWhileLoop(node);
             break;
         default:
             printf("Do not know how to walk this! %d", node->type);

@@ -6,8 +6,15 @@ main;
 	algorithm:
 		age := 0;
 
-		age := age + 9;
+		while age < 10;
+			age := age + 1;
+			
+			if age > 5;
+				print "age: ", age, !;
+				age := age + 1;
+			end if;
+		end while;
 
-		print "age: ", age, !;
+		print "Age ", age;
 
 end main;

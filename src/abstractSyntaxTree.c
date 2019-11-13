@@ -14,6 +14,17 @@
 /* ==============================================================
 /* All the functions to create AstNodes
 /* ============================================================== */
+AstNode* makeWhileLoopNode(int tokenInfoIndex, AstNode* conditionExpr, AstNode* whileBlock) {
+    AstNode* newNode = malloc(sizeof(AstNode));
+    newNode->type = WHILE_LOOP_NODE;
+    newNode->tokenInfoIndex = tokenInfoIndex;
+    newNode->as.whileLoop = malloc(sizeof(WhileLoop));
+    newNode->as.whileLoop->conditionExpression = conditionExpr;
+    newNode->as.whileLoop->whileBlock = whileBlock;
+
+    return newNode;
+}
+
 AstNode* makeIfStatement(AstNode* ifBlock, AstNode* ifCondition, AstNode* elseBlock) {
     AstNode* newNode = malloc(sizeof(AstNode));
     newNode->type = IF_STMT_NODE;
@@ -200,6 +211,7 @@ static void freeStringNode(AstNode* node);
 static void freeNewlineNode(AstNode* node);
 static void freePrintExprNode(AstNode* node);
 static void freePrintListNode(AstNode* node);
+static void freeWhileLoop(AstNode* node);
 
 static void freeNode(AstNode* node) {
     switch(node->type) {
@@ -239,6 +251,9 @@ static void freeNode(AstNode* node) {
         case PRINT_LIST_NODE:
             freePrintListNode(node);
             break;
+        case WHILE_LOOP_NODE:
+            freeWhileLoop(node);
+            break;
         default:
             printf("Do not know how to free memory for: %d", node->type);
             break;
@@ -268,6 +283,15 @@ static void freePrintListNode(AstNode* node) {
     }
 
     free(node->as.printList);
+    free(node);
+    node = NULL;
+}
+
+static void freeWhileLoop(AstNode* node) {
+    freeNode(node->as.whileLoop->conditionExpression);
+    freeNode(node->as.whileLoop->whileBlock);
+
+    free(node->as.whileLoop);
     free(node);
     node = NULL;
 }

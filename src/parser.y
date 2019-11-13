@@ -110,6 +110,7 @@ static int previousTokenIndex = 0;
 %type <node> printExpr;
 %type <node> ifStmt;
 %type <node> elseBlock;
+%type <node> whileLoop;
 
 %%
 
@@ -215,6 +216,7 @@ stmt:
 	  assignStmt                   { $$ = $1; }
 	| ifStmt                       { $$ = $1; }
 	| PRINT_RW printList SEMICOLON { $$ = makePrintListNode($2->tokenInfoIndex, $2); }
+	| whileLoop                    { $$ = $1; }
 ;
 
 printList:
@@ -230,6 +232,10 @@ printItem:
 
 printExpr:
 	expr { $$ = makePrintExpr($1->tokenInfoIndex, $1); }
+;
+
+whileLoop:
+	WHILE_RW expr SEMICOLON blockStmtList END_RW WHILE_RW SEMICOLON { $$ = makeWhileLoopNode($1.tokenIndex, $2, $4); }
 ;
 
 ifStmt:

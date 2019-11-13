@@ -31,7 +31,8 @@ typedef enum {
     NEWLINE_NODE,
     VARIABLE_NODE,
     ARRAY_LOAD_NODE,
-    IF_STMT_NODE
+    IF_STMT_NODE,
+    WHILE_LOOP_NODE,
 } NodeType;
 
 /* ===========================================================================
@@ -140,12 +141,14 @@ typedef struct {
 } ArrayLoad;
 
 /* ===========================================================================
-/* The ArrayLoad node contains the branches for loading array variables
-/* in the middle of an expression.
+/* The IfStmt node contains pointers to the ifBlock, condition expression,
+/* and the else block.
 /*
-/* @SymbolTableEntry symEntry: The variables entry in the symbol table
-/* @AstNode* indexExpr: The pointer to the expression for the index
-/*       e.g a[i + 2] where 'i + 2' is the index expression
+/* @AstNode* ifBlock: The block of statements to be executed if the expression
+/*                    evaluates to true.
+/* @AstNode* conditionStatement: The expression to be evaluated.
+/* @AstNode* elseBlock: The block of statements to be executed if the expression
+/*                      evaluates to false.
 /* ===========================================================================*/
 typedef struct {
     AstNode* ifBlock;
@@ -153,13 +156,39 @@ typedef struct {
     AstNode* elseBlock;
 } IfStmt;
 
+/* ===========================================================================
+/* The PrintListNode is a simple wrapper that points to the first expression
+/* in the print list.
+/*
+/* @AstNode* firstItem: Pointer to the first expression in the list.
+/* ===========================================================================*/
 typedef struct {
     AstNode* firstItem;
 } PrintListNode;
 
+/* ===========================================================================
+/* The PrintExpr is a simple wrapper that is pointing to a expression. The
+/* reason for having this separate is so that their is a clear distinction
+/* when compiling about which expressions are being printed.
+/*
+/* @AstNode* printExpr: The expression tree.
+/* ===========================================================================*/
 typedef struct {
     AstNode* printExpr;
 } PrintExpr;
+
+/* ===========================================================================
+/* The WhileLoop is a node to contain the expression to be evaluated, and 
+/* a pointer to the block of statements for a while loop.
+/*
+/* @AstNode* whileBlock: The block of statements composing the body of the
+/*                       loop.
+/* @AstNode* conditionExpression: The expression to be evaluated.
+/* ===========================================================================*/
+typedef struct {
+    AstNode* whileBlock;
+    AstNode* conditionExpression;
+} WhileLoop;
 
 /* ===========================================================================
 /* The AstNode is the "parent" class of all other node subclasses. The node
@@ -186,6 +215,7 @@ struct AstNode {
         PrintListNode* printList;
         SymbolTableEntry variable;
         PrintExpr* printExpr;
+        WhileLoop* whileLoop;
         char* string;
     } as; 
     AstNode* next;
@@ -219,6 +249,7 @@ AstNode* makeNewlineNode(int tokenInfoIndex);
 AstNode* makeArrayLoadNode(int tokenInfoIndex, char* name, AstNode* indexExpr);
 AstNode* makeIfStatement(AstNode* ifBlock, AstNode* ifCondition, AstNode* elseBlock);
 AstNode* makePrintListNode(int tokenInfoIndex, AstNode* firstItem);
+AstNode* makeWhileLoopNode(int tokenInfoIndex, AstNode* conditionExpr, AstNode* whileBlock);
 
 /* ===========================================================================
 /* A function to free all the memory used for the AST.
