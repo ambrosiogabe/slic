@@ -253,20 +253,23 @@ void freeAst() {
 
     AstNode* currentNode = astRootNode;
     while (currentNode != NULL) {
+        AstNode* tmp = currentNode->next;
         freeNode(currentNode);
-        currentNode = currentNode->next;
+        currentNode = tmp;
     }
 }
 
 static void freePrintListNode(AstNode* node) {
     AstNode* current = node->as.printList->firstItem;
     while (current != NULL) {
+        AstNode* tmp = current->next;
         freeNode(current);
-        current = current->next;
+        current = tmp;
     }
 
     free(node->as.printList);
     free(node);
+    node = NULL;
 }
 
 static void freeIfStmtNode(AstNode* node) {
@@ -276,25 +279,30 @@ static void freeIfStmtNode(AstNode* node) {
     free(node->as.ifStmt);
 
     free(node);
+    node = NULL;
 }
 
 static void freeStringNode(AstNode* node) {
     free(node->as.string);
     free(node);
+    node = NULL;
 }
 
 static void freeNewlineNode(AstNode* node) {
     free(node);
+    node = NULL;
 }
 
 static void freeVariableNode(AstNode* node) {
     free(node);
+    node = NULL;
 }
 
 static void freeArrayLoadNode(AstNode* node) {
     free(node->as.arrayLoad);
 
     free(node);
+    node = NULL;
 }
 
 static void freeAssignmentStatement(AstNode* node) {
@@ -303,6 +311,7 @@ static void freeAssignmentStatement(AstNode* node) {
 
     free(node->as.assignStmt);
     free(node);
+    node = NULL;
 }
 
 static void freeArrayAssignmentStatement(AstNode* node) {
@@ -312,6 +321,7 @@ static void freeArrayAssignmentStatement(AstNode* node) {
 
     free(node->as.arrayAssignStmt);
     free(node);
+    node = NULL;
 }
 
 static void freeExprNode(AstNode* node) {
@@ -324,8 +334,8 @@ static void freeExprNode(AstNode* node) {
 
 static void freePrintExprNode(AstNode* node) {
     freeNode(node->as.printExpr->printExpr);
-    free(node->as.printExpr);
     free(node);
+    node = NULL;
 }
 
 static void freeUnaryExprNode(AstNode* node) {
@@ -333,6 +343,7 @@ static void freeUnaryExprNode(AstNode* node) {
     freeNode(expr->expr);
 
     free(node);
+    node = NULL;
 }
 
 static void freeValueNode(AstNode* node) {
@@ -340,4 +351,5 @@ static void freeValueNode(AstNode* node) {
 
     free(value);
     free(node);
+    node = NULL;
 }

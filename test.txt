@@ -2,16 +2,12 @@ main;
 	data:
 		integer: age;
 		real: floater;
+
 	algorithm:
-		floater := 12.3;
+		age := 0;
 
-		if floater > 12;
-			age := 13;
-		else;
-			age := 2;
-		end if;
+		age := age + 9;
 
-		print "age ", age, !;
-		print "age ", "is";
+		print "age: ", age, !;
 
 end main;

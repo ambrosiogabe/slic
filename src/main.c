@@ -102,7 +102,7 @@ int main(int argc, char** argv)
 
 	// Clean up memory and exit
 	freeInstructionContainer();
-	//freeAst();
+	freeAst();
 	freeSymbolTable();
 	free(sourceCode);
    	return 0;
