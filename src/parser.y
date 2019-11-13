@@ -111,6 +111,7 @@ static int previousTokenIndex = 0;
 %type <node> ifStmt;
 %type <node> elseBlock;
 %type <node> whileLoop;
+%type <node> countingLoop;
 
 %%
 
@@ -217,6 +218,7 @@ stmt:
 	| ifStmt                       { $$ = $1; }
 	| PRINT_RW printList SEMICOLON { $$ = makePrintListNode($2->tokenInfoIndex, $2); }
 	| whileLoop                    { $$ = $1; }
+	| countingLoop                 { $$ = $1; }
 ;
 
 printList:
@@ -236,6 +238,19 @@ printExpr:
 
 whileLoop:
 	WHILE_RW expr SEMICOLON blockStmtList END_RW WHILE_RW SEMICOLON { $$ = makeWhileLoopNode($1.tokenIndex, $2, $4); }
+;
+
+countingLoop:
+	  COUNTING_RW VARIABLE UPWARD_RW expr TO_RW expr SEMICOLON blockStmtList END_RW COUNTING_RW SEMICOLON
+	  			{
+					AstNode* variable = makeVariableNode($2.tokenIndex, $2.sval);
+					$$ = makeCountingLoopNode($1.tokenIndex, variable, 1, $4, $6, $8);
+				}
+	| COUNTING_RW VARIABLE DOWNWARD_RW expr TO_RW expr SEMICOLON blockStmtList END_RW COUNTING_RW SEMICOLON
+				{
+					AstNode* variable = makeVariableNode($2.tokenIndex, $2.sval);
+					$$ = makeCountingLoopNode($1.tokenIndex, variable, 0, $4, $6, $8);
+				}
 ;
 
 ifStmt:

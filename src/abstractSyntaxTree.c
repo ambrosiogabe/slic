@@ -14,6 +14,21 @@
 /* ==============================================================
 /* All the functions to create AstNodes
 /* ============================================================== */
+AstNode* makeCountingLoopNode(int tokenInfoIndex, AstNode* variable, int isUpward, AstNode* startExpr, AstNode* endExpr, AstNode* body) {
+    AstNode* newNode = malloc(sizeof(AstNode));
+    newNode->type = COUNTING_LOOP_NODE;
+    newNode->tokenInfoIndex = tokenInfoIndex;
+    
+    newNode->as.countingLoop = malloc(sizeof(CountingLoop));
+    newNode->as.countingLoop->variable = variable;
+    newNode->as.countingLoop->isUpward = isUpward;
+    newNode->as.countingLoop->startExpr = startExpr;
+    newNode->as.countingLoop->endExpr = endExpr;
+    newNode->as.countingLoop->body = body;
+
+    return newNode;
+}
+
 AstNode* makeWhileLoopNode(int tokenInfoIndex, AstNode* conditionExpr, AstNode* whileBlock) {
     AstNode* newNode = malloc(sizeof(AstNode));
     newNode->type = WHILE_LOOP_NODE;
@@ -289,7 +304,12 @@ static void freePrintListNode(AstNode* node) {
 
 static void freeWhileLoop(AstNode* node) {
     freeNode(node->as.whileLoop->conditionExpression);
-    freeNode(node->as.whileLoop->whileBlock);
+    AstNode* current = node->as.whileLoop->whileBlock;
+    while (current != NULL) {
+        AstNode* tmp = current->next;
+        freeNode(current);
+        current = tmp;
+    }
 
     free(node->as.whileLoop);
     free(node);
@@ -298,8 +318,20 @@ static void freeWhileLoop(AstNode* node) {
 
 static void freeIfStmtNode(AstNode* node) {
     freeNode(node->as.ifStmt->conditionStatement);
-    freeNode(node->as.ifStmt->ifBlock);
-    freeNode(node->as.ifStmt->elseBlock);
+
+    AstNode* current = node->as.ifStmt->ifBlock;
+    while (current != NULL) {
+        AstNode* tmp = current->next;
+        freeNode(current);
+        current = tmp;
+    }
+    
+    current = node->as.ifStmt->elseBlock;
+    while (current != NULL) {
+        AstNode* tmp = current->next;
+        freeNode(current);
+        current = tmp;
+    }
     free(node->as.ifStmt);
 
     free(node);
