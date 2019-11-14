@@ -42,7 +42,7 @@ AstNode* makeCountingLoopNode(int tokenInfoIndex, AstNode* variable, int isUpwar
     // Create a variable to hold the endExpression value and insert in symbol table
     char* varBuffer = malloc(sizeof(char) * 10);
     snprintf(varBuffer, sizeof(char) * 10, "%d", tokenInfoIndex);
-    insertSymbolTable(INT, varBuffer, symbolTable.size, SCALAR, 1);
+    insertSymbolTable(INT, varBuffer, SCALAR, 1);
     AstNode* newVariable = makeVariableNode(tokenInfoIndex, varBuffer);
 
     // Synthesize an assignment to that variable, and a check if the startVariable is greater than this variable

@@ -173,7 +173,7 @@ static void walkArrayLoadNode(AstNode* node) {
     insertIntInstruction(LAA, node->as.arrayLoad->symEntry.address);
     walkNode(node->as.arrayLoad->indexExpr);
 
-    if (node->as.arrayAssignStmt->indexExpr->isFloaty) {
+    if (node->as.arrayLoad->indexExpr->isFloaty) {
         insertEmptyInstruction(FTI);
     }
 

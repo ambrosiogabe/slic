@@ -33,7 +33,6 @@ int yyerrorInfo(const char* s, TokenInformation token);
 int yylex();
 
 DataType currentType;
-int address = 0;
 static int previousTokenIndex = 0;
 
 %}
@@ -126,7 +125,7 @@ mainBlock:
 ;
 
 dataBlock:
-	  DATA_RW COLON declarationStmtList {if(DEBUG_PARSER) printf("DATA BLOCK\n");}
+	  DATA_RW COLON declarationStmtList
 ;
 
 algorithmBlock:
@@ -134,8 +133,8 @@ algorithmBlock:
 ;
 
 declarationStmtList:
-	  declarationStmtList dataType COLON declarationList SEMICOLON     {if(DEBUG_PARSER) printf("||Declaration List\n");}
-	| dataType COLON declarationList SEMICOLON                         {if(DEBUG_PARSER) printf("||Declaration List\n");}
+	  declarationStmtList dataType COLON declarationList SEMICOLON     
+	| dataType COLON declarationList SEMICOLON                         
 ;
 
 dataType:
@@ -150,23 +149,19 @@ declarationList:
 
 declarationItem:
 	  VARIABLE                                  {
-		  											if(DEBUG_PARSER) printf("%s ", $1);
 													if (getSymbol($1.sval).address != 65535) {														
 														yyerrorInfo("Duplicate variable declaration.", tokenTable.table[$1.tokenIndex]);
 														YYERROR;
 													}
-													insertSymbolTable(currentType, $1.sval, address, SCALAR, 1);
-													address++;
+													insertSymbolTable(currentType, $1.sval, SCALAR, 1);
 												}
 	| VARIABLE LEFT_BRACKET INTEGER RIGHT_BRACKET    
 												{
-													if(DEBUG_PARSER) printf("%s[] ", $1);
 													if (getSymbol($1.sval).address != 65535) {
 														yyerrorInfo("Duplicate variable declaration.", tokenTable.table[$1.tokenIndex]);
 														YYERROR;
 													}
-													insertSymbolTable(currentType, $1.sval, address, ARRAY, $3.ival);
-													address += $3.ival;
+													insertSymbolTable(currentType, $1.sval, ARRAY, $3.ival);
 												}
 ;
 

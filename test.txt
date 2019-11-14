@@ -1,41 +1,48 @@
 #=================================================================
-# File--------euclid.slic
+# File--------sort.slic
 # Programmer--Bryan Crawley
 # Project-----Slic example
 # 
-# This program uses Euclid's Algorithm to compute and display the
-# greatest common divisor of two positive integers.
+# This program uses a Selection Sort to sort a list of ten
+# integers into ascending order.
 #=================================================================
 
 main;
 	data:
-		integer: A, B, D, Temp, Asave, Bsave;
-	
+		integer: List[10];  # The list of integers.
+		integer: Size; # Number of entries in the list.
+		integer: Top, J;    # Counters for counting loop.
+		integer: MaxLoc;    # Index of largest value in list.
+		integer: Temp;      # Used in exchanging array values.
+		
 	algorithm:
-		print !,!, "                      SLIC Demonstration", !;
-		print !, "This program uses Euclid's Algorithm to determine the  greatest";
-		print !, "common divisor of two positive integers.  It will prompt you to";
-		print !, "enter the two integers A and B, and  will display the result on";
-		print !, "the screen.  The program is written in SLIC,  a new programming";
-		print !, "language designed and implemented at Georgetown College.";
+		Size := 10; 
+		
+		# Enter and print the initial list of numbers.
+		counting J upward 0 to Size-1;
+			print "Element #", J, ": ";
+			read List[J];
+		end counting;
+		
 		print !;
-		print !, "Enter A: ";
-		read Asave;
-		print "Enter B: ";
-		read Bsave;
-		A := Asave;
-		B := Bsave;
-		while A<>B;
-			if A<B;
-				Temp := A;
-				A := B;
-				B := Temp;
-			end if;
-			D := A -B;
-			A := B;
-			B := D;
-		end while;
-		print !,"Greatest common divisor of ";
-		print Asave, " and ", Bsave, " is ", A, ".", !, !;
-	exit;
+		
+		# Sort the numbers with a Selection Sort.
+		counting Top downward Size-1 to 1;
+			MaxLoc := 0;
+			counting J upward 1 to Top;
+				if List[J] > List[MaxLoc];
+					MaxLoc := J;
+				end if;
+			end counting;
+			Temp := List[Top];
+			List[Top] := List[MaxLoc];
+			List[MaxLoc] := Temp;
+		end counting;
+		
+		# Print the sorted list.
+		counting J upward 0 to Size-1;
+			print "Sorted #",J,": ",List[J],!;
+		end counting;
+		print !,"Finished",!;
+		exit;
 end main;

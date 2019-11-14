@@ -13,6 +13,7 @@
 #include "symbolTable.h"
 
 void initSymbolTable() {
+    symbolTable.nextAddress = 0;
     symbolTable.size = 0;
     symbolTable.capacity = 8;
     symbolTable.symbols = (SymbolTableEntry*)malloc(symbolTable.capacity * sizeof(SymbolTableEntry));
@@ -25,20 +26,21 @@ void freeSymbolTable() {
     free(symbolTable.symbols);
 }
 
-static SymbolTableEntry makeSymbol(DataType type, char* name, uint16_t address, DataStructure structure, uint16_t size) {
+static SymbolTableEntry makeSymbol(DataType type, char* name, DataStructure structure, uint16_t size) {
     SymbolTableEntry entry;
     entry.type = type;
     entry.name = name;
-    entry.address = address;
+    entry.address = symbolTable.nextAddress;
     entry.structure = structure;
     entry.size = size;
     entry.hashValue = hashVariableName(name);
+    symbolTable.nextAddress += size;
 
     return entry;
 }
 
-void insertSymbolTable(DataType type, char* name, uint16_t address, DataStructure structure, uint16_t size) {
-    SymbolTableEntry entry = makeSymbol(type, name, address, structure, size);
+void insertSymbolTable(DataType type, char* name, DataStructure structure, uint16_t size) {
+    SymbolTableEntry entry = makeSymbol(type, name, structure, size);
     if (symbolTable.size + 1 >= symbolTable.capacity) {
         symbolTable.capacity *= 2;
         symbolTable.symbols = realloc(symbolTable.symbols, symbolTable.capacity * sizeof(SymbolTableEntry));

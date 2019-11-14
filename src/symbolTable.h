@@ -64,13 +64,14 @@ typedef struct {
     SymbolTableEntry* symbols;
     unsigned int size;
     unsigned int capacity;
+    unsigned int nextAddress;
 } SymbolTable;
 
 SymbolTable symbolTable;
 
 void initSymbolTable();
 void freeSymbolTable();
-void insertSymbolTable(DataType type, char* name, uint16_t address, DataStructure structure, uint16_t size);
+void insertSymbolTable(DataType type, char* name, DataStructure structure, uint16_t size);
 SymbolTableEntry getSymbol(char* name);
 unsigned int hashVariableName(char* name); 
 void printSymbolTable();
