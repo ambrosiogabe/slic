@@ -181,6 +181,32 @@ static void walkArrayLoadNode(AstNode* node) {
     insertEmptyInstruction(LOD);
 }
 
+static void walkReadArrayNode(AstNode* node) {
+    insertIntInstruction(LAA, node->as.readArrayNode->variable->as.variable.address);
+    walkNode(node->as.readArrayNode->expr);
+
+    if (node->as.readArrayNode->expr->isFloaty) {
+        insertEmptyInstruction(FTI);
+    }
+
+    insertEmptyInstruction(ADI);
+    if (node->as.readArrayNode->variable->as.variable.type == INT)
+        insertEmptyInstruction(INI);
+    else 
+        insertEmptyInstruction(INF);
+    
+    insertEmptyInstruction(STO);
+}
+
+static void walkReadNode(AstNode* node) {
+    insertIntInstruction(LAA, node->as.readArrayNode->variable->as.variable.address);
+    if (node->as.readArrayNode->variable->as.variable.type == INT)
+        insertEmptyInstruction(INI);
+    else 
+        insertEmptyInstruction(INF);
+    insertEmptyInstruction(STO);
+}
+
 static void walkValueNode(AstNode* node) {
     if (node->isFloaty) {
         insertFloatInstruction(LLF, node->as.value->as.rVal);
@@ -404,6 +430,15 @@ static void walkNode(AstNode* node) {
             break;
         case COUNTING_LOOP_NODE:
             walkCountingLoop(node);
+            break;
+        case READ_NODE:
+            walkReadNode(node);
+            break;
+        case READ_ARRAY_NODE:
+            walkReadArrayNode(node);
+            break;
+        case EXIT_NODE:
+            insertEmptyInstruction(HLT);
             break;
         default:
             printf("Do not know how to walk this! %d", node->type);

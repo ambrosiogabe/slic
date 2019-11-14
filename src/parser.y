@@ -112,6 +112,8 @@ static int previousTokenIndex = 0;
 %type <node> elseBlock;
 %type <node> whileLoop;
 %type <node> countingLoop;
+%type <node> readStmt;
+%type <node> exitStmt;
 
 %%
 
@@ -219,6 +221,12 @@ stmt:
 	| PRINT_RW printList SEMICOLON { $$ = makePrintListNode($2->tokenInfoIndex, $2); }
 	| whileLoop                    { $$ = $1; }
 	| countingLoop                 { $$ = $1; }
+	| readStmt                     { $$ = $1; }
+	| exitStmt                     { $$ = $1; }
+;
+
+exitStmt:
+	EXIT_RW SEMICOLON { $$ = makeExitNode($1.tokenIndex); }
 ;
 
 printList:
@@ -234,6 +242,11 @@ printItem:
 
 printExpr:
 	expr { $$ = makePrintExpr($1->tokenInfoIndex, $1); }
+;
+
+readStmt:
+	  READ_RW VARIABLE SEMICOLON                                 { $$ = makeReadNode($1.tokenIndex, $2.sval); }
+	| READ_RW VARIABLE LEFT_BRACKET expr RIGHT_BRACKET SEMICOLON { $$ = makeReadArrayNode($1.tokenIndex, $2.sval, $4); }
 ;
 
 whileLoop:

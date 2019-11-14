@@ -77,6 +77,29 @@ AstNode* makeIfStatement(AstNode* ifBlock, AstNode* ifCondition, AstNode* elseBl
     return newNode;
 }
 
+AstNode* makeReadNode(int tokenInfoIndex, char* name) {
+    AstNode* newNode = malloc(sizeof(AstNode));
+    newNode->type = READ_NODE;
+    newNode->tokenInfoIndex = tokenInfoIndex;
+    newNode->as.readArrayNode = malloc(sizeof(ReadArrayNode));
+    newNode->as.readArrayNode->variable = makeVariableNode(tokenInfoIndex, name);
+    newNode->as.readArrayNode->expr = NULL;
+
+    return newNode;
+}
+
+AstNode* makeReadArrayNode(int tokenInfoIndex, char* name, AstNode* expr) {
+    AstNode* newNode = malloc(sizeof(AstNode));
+    newNode->type = READ_ARRAY_NODE;
+    newNode->tokenInfoIndex = tokenInfoIndex;
+
+    newNode->as.readArrayNode = malloc(sizeof(ReadArrayNode));
+    newNode->as.readArrayNode->variable = makeVariableNode(tokenInfoIndex, name);
+    newNode->as.readArrayNode->expr = expr;
+
+    return newNode;
+}
+
 AstNode* makeAssignmentNode(int tokenInfoIndex, char* name, AstNode* expr) {
     if (!IS_TYPE_OF_EXPR(*expr)) {
         yyerrorInfo("You can only assign an expression to a variable!", tokenTable.table[expr->tokenInfoIndex]);
@@ -220,6 +243,14 @@ AstNode* makeVariableNode(int tokenInfoIndex, char* name) {
     return newNode;
 }
 
+AstNode* makeExitNode(int tokenInfoIndex) {
+    AstNode* newNode = malloc(sizeof(AstNode));
+    newNode->type = EXIT_NODE;
+    newNode->tokenInfoIndex = tokenInfoIndex;
+
+    return newNode;
+}
+
 AstNode* makeArrayLoadNode(int tokenInfoIndex, char* name, AstNode* indexExpr) {
     SymbolTableEntry symEntry = getSymbol(name);
     AstNode* newNode = malloc(sizeof(AstNode));
@@ -254,6 +285,9 @@ static void freePrintExprNode(AstNode* node);
 static void freePrintListNode(AstNode* node);
 static void freeWhileLoop(AstNode* node);
 static void freeCountingLoop(AstNode* node);
+static void freeReadNode(AstNode* node);
+static void freeReadArrayNode(AstNode* node);
+static void freeExitNode(AstNode* node);
 
 static void freeNode(AstNode* node) {
     switch(node->type) {
@@ -299,6 +333,15 @@ static void freeNode(AstNode* node) {
         case COUNTING_LOOP_NODE:
             freeCountingLoop(node);
             break;
+        case READ_NODE:
+            freeReadNode(node);
+            break;
+        case READ_ARRAY_NODE:
+            freeReadArrayNode(node);
+            break;
+        case EXIT_NODE:
+            freeExitNode(node);
+            break;
         default:
             printf("Do not know how to free memory for: %d", node->type);
             break;
@@ -317,6 +360,27 @@ void freeAst() {
         freeNode(currentNode);
         currentNode = tmp;
     }
+}
+
+static void freeExitNode(AstNode* node) {
+    free(node);
+    node = NULL;
+}
+
+static void freeReadNode(AstNode* node) {
+    freeNode(node->as.readArrayNode->variable);
+    free(node->as.readArrayNode);
+
+    free(node);
+    node = NULL;
+}
+
+static void freeReadArrayNode(AstNode* node) {
+    freeNode(node->as.readArrayNode->variable);
+    freeNode(node->as.readArrayNode->expr);
+
+    free(node);
+    node = NULL;
 }
 
 static void freePrintListNode(AstNode* node) {

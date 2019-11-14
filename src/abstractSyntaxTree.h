@@ -34,6 +34,9 @@ typedef enum {
     IF_STMT_NODE,
     WHILE_LOOP_NODE,
     COUNTING_LOOP_NODE,
+    READ_NODE,
+    READ_ARRAY_NODE,
+    EXIT_NODE,
 } NodeType;
 
 /* ===========================================================================
@@ -200,6 +203,11 @@ typedef struct {
     AstNode* body;
 } CountingLoop;
 
+typedef struct {
+    AstNode* variable;
+    AstNode* expr;
+} ReadArrayNode;
+
 /* ===========================================================================
 /* The AstNode is the "parent" class of all other node subclasses. The node
 /* subclasses are denoted by the union and the type.
@@ -227,6 +235,7 @@ struct AstNode {
         PrintExpr* printExpr;
         WhileLoop* whileLoop;
         CountingLoop* countingLoop;
+        ReadArrayNode* readArrayNode;
         char* string;
     } as; 
     AstNode* next;
@@ -262,6 +271,9 @@ AstNode* makeIfStatement(AstNode* ifBlock, AstNode* ifCondition, AstNode* elseBl
 AstNode* makePrintListNode(int tokenInfoIndex, AstNode* firstItem);
 AstNode* makeWhileLoopNode(int tokenInfoIndex, AstNode* conditionExpr, AstNode* whileBlock);
 AstNode* makeCountingLoopNode(int tokenInfoIndex, AstNode* variable, int isUpward, AstNode* startExpr, AstNode* endExpr, AstNode* body);
+AstNode* makeReadArrayNode(int tokenInfoIndex, char* name, AstNode* expr);
+AstNode* makeReadNode(int tokenInfoIndex, char* name);
+AstNode* makeExitNode(int tokenInfoIndex);
 
 /* ===========================================================================
 /* A function to free all the memory used for the AST.
