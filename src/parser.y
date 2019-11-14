@@ -272,18 +272,10 @@ elseBlock:
 
 assignStmt:
 	VARIABLE ASSIGN_TOKEN expr SEMICOLON 	{ 
-												if (getSymbol($1.sval).address == 65535) {
-													yyerrorInfo("Unknown variable.", tokenTable.table[$1.tokenIndex]);
-													YYERROR;
-												}
 												$$ = makeAssignmentNode($1.tokenIndex, $1.sval, $3); 
 											} 
 	| VARIABLE LEFT_BRACKET expr RIGHT_BRACKET ASSIGN_TOKEN expr SEMICOLON 
 											{ 
-												if (getSymbol($1.sval).address == 65535) {
-													yyerrorInfo("Unknown variable.", tokenTable.table[$1.tokenIndex]);
-													YYERROR;
-												}
 												$$ = makeArrayAssignmentNode($1.tokenIndex, $1.sval, $3, $6);
 											}
 ;
@@ -324,21 +316,8 @@ unary:
 ;
 
 factor: 
-	  VARIABLE  {
-		  			if (getSymbol($1.sval).address == 65535) {
-						  yyerror("Undeclared variable.");
-						  YYERROR;
-					}
-					$$ = makeVariableNode($1.tokenIndex, $1.sval);
-				}
-	| VARIABLE LEFT_BRACKET expr RIGHT_BRACKET   
-				{
-					if (getSymbol($1.sval).address == 65535) {
-						yyerrorInfo("Undeclared variable.", tokenTable.table[tokenTable.size - 4]);
-						YYERROR;
-					}
-					$$ = makeArrayLoadNode($1.tokenIndex, $1.sval, $3);
-				}
+	  VARIABLE                                   { $$ = makeVariableNode($1.tokenIndex, $1.sval); }
+	| VARIABLE LEFT_BRACKET expr RIGHT_BRACKET   { $$ = makeArrayLoadNode($1.tokenIndex, $1.sval, $3); }
 	| REAL_NUMBER                                {$$ = makeFloatValueNode($1.tokenIndex, $1.rval);}
 	| INTEGER                                    {$$ = makeIntValueNode($1.tokenIndex, $1.ival);}
 	| LEFT_PAREN expr RIGHT_PAREN                {$$ = $2;}

@@ -14,13 +14,19 @@
 
 static void freeNode(AstNode* node);
 
+static AstNode* initNode(NodeType type, int tokenIndex) {
+    AstNode* newNode = malloc(sizeof(AstNode));
+    newNode->type = type;
+    newNode->tokenInfoIndex = tokenIndex;
+
+    return newNode;
+}
+
 /* ==============================================================
 /* All the functions to create AstNodes
 /* ============================================================== */
 AstNode* makeCountingLoopNode(int tokenInfoIndex, AstNode* variable, int isUpward, AstNode* startExpr, AstNode* endExpr, AstNode* body) {
-    AstNode* newNode = malloc(sizeof(AstNode));
-    newNode->type = COUNTING_LOOP_NODE;
-    newNode->tokenInfoIndex = tokenInfoIndex;
+    AstNode* newNode = initNode(COUNTING_LOOP_NODE, tokenInfoIndex);
     
     // Initialize easy stuff
     newNode->as.countingLoop = malloc(sizeof(CountingLoop));
@@ -56,9 +62,7 @@ AstNode* makeCountingLoopNode(int tokenInfoIndex, AstNode* variable, int isUpwar
 }
 
 AstNode* makeWhileLoopNode(int tokenInfoIndex, AstNode* conditionExpr, AstNode* whileBlock) {
-    AstNode* newNode = malloc(sizeof(AstNode));
-    newNode->type = WHILE_LOOP_NODE;
-    newNode->tokenInfoIndex = tokenInfoIndex;
+    AstNode* newNode = initNode(WHILE_LOOP_NODE, tokenInfoIndex);
     newNode->as.whileLoop = malloc(sizeof(WhileLoop));
     newNode->as.whileLoop->conditionExpression = conditionExpr;
     newNode->as.whileLoop->whileBlock = whileBlock;
@@ -67,8 +71,7 @@ AstNode* makeWhileLoopNode(int tokenInfoIndex, AstNode* conditionExpr, AstNode* 
 }
 
 AstNode* makeIfStatement(AstNode* ifBlock, AstNode* ifCondition, AstNode* elseBlock) {
-    AstNode* newNode = malloc(sizeof(AstNode));
-    newNode->type = IF_STMT_NODE;
+    AstNode* newNode = initNode(IF_STMT_NODE, ifBlock->tokenInfoIndex);
     newNode->as.ifStmt = malloc(sizeof(IfStmt));
     newNode->as.ifStmt->ifBlock = ifBlock;
     newNode->as.ifStmt->conditionStatement = ifCondition;
@@ -78,9 +81,7 @@ AstNode* makeIfStatement(AstNode* ifBlock, AstNode* ifCondition, AstNode* elseBl
 }
 
 AstNode* makeReadNode(int tokenInfoIndex, char* name) {
-    AstNode* newNode = malloc(sizeof(AstNode));
-    newNode->type = READ_NODE;
-    newNode->tokenInfoIndex = tokenInfoIndex;
+    AstNode* newNode = initNode(READ_NODE, tokenInfoIndex);
     newNode->as.readArrayNode = malloc(sizeof(ReadArrayNode));
     newNode->as.readArrayNode->variable = makeVariableNode(tokenInfoIndex, name);
     newNode->as.readArrayNode->expr = NULL;
@@ -89,9 +90,7 @@ AstNode* makeReadNode(int tokenInfoIndex, char* name) {
 }
 
 AstNode* makeReadArrayNode(int tokenInfoIndex, char* name, AstNode* expr) {
-    AstNode* newNode = malloc(sizeof(AstNode));
-    newNode->type = READ_ARRAY_NODE;
-    newNode->tokenInfoIndex = tokenInfoIndex;
+    AstNode* newNode = initNode(READ_ARRAY_NODE, tokenInfoIndex);
 
     newNode->as.readArrayNode = malloc(sizeof(ReadArrayNode));
     newNode->as.readArrayNode->variable = makeVariableNode(tokenInfoIndex, name);
@@ -106,9 +105,7 @@ AstNode* makeAssignmentNode(int tokenInfoIndex, char* name, AstNode* expr) {
         exit(-1);
     }
 
-    AstNode* newNode = malloc(sizeof(AstNode));
-    newNode->tokenInfoIndex = tokenInfoIndex;
-    newNode->type = ASSIGN_STMT_NODE;
+    AstNode* newNode = initNode(ASSIGN_STMT_NODE, tokenInfoIndex);
     AstNode* varNode = makeVariableNode(tokenInfoIndex, name);
     newNode->as.assignStmt = malloc(sizeof(AssignStmt));
     newNode->as.assignStmt->variableNode = varNode;
@@ -128,9 +125,7 @@ AstNode* makeArrayAssignmentNode(int tokenInfoIndex, char* name, AstNode* indexE
         exit(-1);
     }
 
-    AstNode* newNode = malloc(sizeof(AstNode));
-    newNode->tokenInfoIndex = tokenInfoIndex;
-    newNode->type = ARRAY_ASSIGN_STMT_NODE;
+    AstNode* newNode = initNode(ARRAY_ASSIGN_STMT_NODE, tokenInfoIndex);
     AstNode* varNode = makeVariableNode(tokenInfoIndex, name);
     newNode->as.arrayAssignStmt = malloc(sizeof(ArrayAssignStmt));
     newNode->as.arrayAssignStmt->variableNode = varNode;
@@ -142,9 +137,7 @@ AstNode* makeArrayAssignmentNode(int tokenInfoIndex, char* name, AstNode* indexE
 }
 
 AstNode* makeExprNode(int tokenInfoIndex, ExprOp op, AstNode* leftExpr, AstNode* rightExpr) {
-    AstNode* newNode = malloc(sizeof(AstNode));
-    newNode->tokenInfoIndex = tokenInfoIndex;
-    newNode->type = EXPR_NODE;
+    AstNode* newNode = initNode(EXPR_NODE, tokenInfoIndex);
     newNode->as.expression = malloc(sizeof(Expr));
     newNode->as.expression->op = op;
     newNode->isFloaty = leftExpr->isFloaty | rightExpr->isFloaty;
@@ -160,8 +153,7 @@ AstNode* makeExprNode(int tokenInfoIndex, ExprOp op, AstNode* leftExpr, AstNode*
 }
 
 AstNode* makePrintExpr(int tokenIndex, AstNode* expr) {
-    AstNode* newNode = malloc(sizeof(AstNode));
-    newNode->type = PRINT_EXPRESSION_NODE;
+    AstNode* newNode = initNode(PRINT_EXPRESSION_NODE, tokenIndex);
     newNode->as.printExpr = malloc(sizeof(PrintExpr));
     newNode->as.printExpr->printExpr = expr;
 
@@ -169,8 +161,7 @@ AstNode* makePrintExpr(int tokenIndex, AstNode* expr) {
 }
 
 AstNode* makePrintListNode(int tokenInfoIndex, AstNode* firstItem) {
-    AstNode* newNode = malloc(sizeof(AstNode));
-    newNode->type = PRINT_LIST_NODE;
+    AstNode* newNode = initNode(PRINT_LIST_NODE, tokenInfoIndex);
     newNode->as.printList = malloc(sizeof(PrintListNode));
     newNode->as.printList->firstItem = firstItem;
 
@@ -178,9 +169,7 @@ AstNode* makePrintListNode(int tokenInfoIndex, AstNode* firstItem) {
 }
 
 AstNode* makeUnaryExprNode(int tokenInfoIndex, ExprOp op, AstNode* expr) {
-    AstNode* newNode = malloc(sizeof(AstNode));
-    newNode->tokenInfoIndex = tokenInfoIndex;
-    newNode->type = UNARY_EXPR_NODE;
+    AstNode* newNode = initNode(UNARY_EXPR_NODE, tokenInfoIndex);
     newNode->as.unaryExpr = malloc(sizeof(UnaryExpr));
     newNode->as.unaryExpr->op = op;
     newNode->as.unaryExpr->expr = expr;
@@ -190,9 +179,7 @@ AstNode* makeUnaryExprNode(int tokenInfoIndex, ExprOp op, AstNode* expr) {
 }
 
 AstNode* makeFloatValueNode(int tokenInfoIndex, float value) {
-    AstNode* newNode = malloc(sizeof(AstNode));
-    newNode->tokenInfoIndex = tokenInfoIndex;
-    newNode->type = VALUE_NODE;
+    AstNode* newNode = initNode(VALUE_NODE, tokenInfoIndex);
     newNode->as.value = malloc(sizeof(Value));
 
     newNode->as.value->type = REAL;
@@ -203,9 +190,7 @@ AstNode* makeFloatValueNode(int tokenInfoIndex, float value) {
 }
 
 AstNode* makeIntValueNode(int tokenInfoIndex, int value) {
-    AstNode* newNode = malloc(sizeof(AstNode));
-    newNode->tokenInfoIndex = tokenInfoIndex;
-    newNode->type = VALUE_NODE;
+    AstNode* newNode = initNode(VALUE_NODE, tokenInfoIndex);
     newNode->as.value = malloc(sizeof(Value));
 
     newNode->as.value->type = INT;
@@ -216,27 +201,25 @@ AstNode* makeIntValueNode(int tokenInfoIndex, int value) {
 }
 
 AstNode* makeStringNode(int tokenInfoIndex, char* string) {
-    AstNode* newNode = malloc(sizeof(AstNode));
-    newNode->tokenInfoIndex = tokenInfoIndex;
-    newNode->type = STRING_VALUE_NODE;
+    AstNode* newNode = initNode(STRING_VALUE_NODE, tokenInfoIndex);
     newNode->as.string = string;
 
     return newNode;
 }
 
 AstNode* makeNewlineNode(int tokenInfoIndex) {
-    AstNode* newNode = malloc(sizeof(AstNode));
-    newNode->tokenInfoIndex = tokenInfoIndex;
-    newNode->type = NEWLINE_NODE;
-    
+    AstNode* newNode = initNode(NEWLINE_NODE, tokenInfoIndex);    
     return newNode;
 }
 
 AstNode* makeVariableNode(int tokenInfoIndex, char* name) {
     SymbolTableEntry symEntry = getSymbol(name);
-    AstNode* newNode = malloc(sizeof(AstNode));
-    newNode->tokenInfoIndex = tokenInfoIndex;
-    newNode->type = VARIABLE_NODE;
+    if (symEntry.address == 65535) {
+        yyerrorInfo("Undeclared variable!", tokenTable.table[tokenInfoIndex]);
+        exit(-1);
+    }
+
+    AstNode* newNode = initNode(VARIABLE_NODE, tokenInfoIndex);
     newNode->as.variable = symEntry;
     newNode->isFloaty = symEntry.type == REAL;
 
@@ -244,18 +227,18 @@ AstNode* makeVariableNode(int tokenInfoIndex, char* name) {
 }
 
 AstNode* makeExitNode(int tokenInfoIndex) {
-    AstNode* newNode = malloc(sizeof(AstNode));
-    newNode->type = EXIT_NODE;
-    newNode->tokenInfoIndex = tokenInfoIndex;
-
+    AstNode* newNode = initNode(EXIT_NODE, tokenInfoIndex);
     return newNode;
 }
 
 AstNode* makeArrayLoadNode(int tokenInfoIndex, char* name, AstNode* indexExpr) {
     SymbolTableEntry symEntry = getSymbol(name);
-    AstNode* newNode = malloc(sizeof(AstNode));
-    newNode->tokenInfoIndex = tokenInfoIndex;
-    newNode->type = ARRAY_LOAD_NODE;
+    if (symEntry.address == 65535) {
+        yyerrorInfo("Undeclared variable!", tokenTable.table[tokenInfoIndex]);
+        exit(-1);
+    }
+
+    AstNode* newNode = initNode(ARRAY_LOAD_NODE, tokenInfoIndex);
     newNode->as.arrayLoad = malloc(sizeof(ArrayLoad));
     newNode->isFloaty = symEntry.type == REAL;
 

@@ -1,48 +1,85 @@
-#=================================================================
-# File--------sort.slic
+#===============================================================
+# File--------zeller.slic
 # Programmer--Bryan Crawley
-# Project-----Slic example
-# 
-# This program uses a Selection Sort to sort a list of ten
-# integers into ascending order.
-#=================================================================
+# Project-----Slic demo
+#
+# This program uses Zeller's Congruence to compute the day of
+# the week upon which any given calendar date falls. The user
+# specifies the month, day, and year as integers. The program
+# responds with the name of the corresponding weekday.
+#
+# Note: Zeller's Conguence only works for the Gregorian
+# calendar.
+#===============================================================
 
 main;
-	data:
-		integer: List[10];  # The list of integers.
-		integer: Size; # Number of entries in the list.
-		integer: Top, J;    # Counters for counting loop.
-		integer: MaxLoc;    # Index of largest value in list.
-		integer: Temp;      # Used in exchanging array values.
-		
-	algorithm:
-		Size := 10; 
-		
-		# Enter and print the initial list of numbers.
-		counting J upward 0 to Size-1;
-			print "Element #", J, ": ";
-			read List[J];
-		end counting;
-		
-		print !;
-		
-		# Sort the numbers with a Selection Sort.
-		counting Top downward Size-1 to 1;
-			MaxLoc := 0;
-			counting J upward 1 to Top;
-				if List[J] > List[MaxLoc];
-					MaxLoc := J;
-				end if;
-			end counting;
-			Temp := List[Top];
-			List[Top] := List[MaxLoc];
-			List[MaxLoc] := Temp;
-		end counting;
-		
-		# Print the sorted list.
-		counting J upward 0 to Size-1;
-			print "Sorted #",J,": ",List[J],!;
-		end counting;
-		print !,"Finished",!;
-		exit;
+
+   data:
+
+      integer: year, month, day;
+      integer: m, y, c;
+      integer: temp, weekday;
+
+   algorithm:
+
+      print !;
+      print "Month----";
+      read month;
+      print "Day------";
+      read day; 
+      print "Year-----";
+      read year;
+
+      if (month <= 2);
+         year := year - 1;
+         m := month + 12;
+      else;
+         m := month;
+      end if;
+
+      c := year/100;
+      y := year - (c*100);
+
+      temp := day + (m+1)*26/10 + y + y/4 + c/4 - 2*c + 7;
+      weekday := temp - temp/7*7;
+
+      # This "if" is necessary to make sure weekday is positive,
+      # because we did a remainder instead of a true modulus.
+      if (weekday < 0);
+         weekday := weekday + 7;
+      end if;
+
+      print "Weekday--";
+
+      if (weekday = 1);
+         print "Sunday";
+      end if; 
+
+      if (weekday = 2);
+         print "Monday";
+      end if; 
+
+      if (weekday = 3);
+         print "Tuesday";
+      end if; 
+
+      if (weekday = 4);
+         print "Wednesday";
+      end if; 
+
+      if (weekday = 5);
+         print "Thursday";
+      end if; 
+
+      if (weekday = 6);
+         print "Friday";
+      end if; 
+
+      if (weekday = 0);
+         print "Saturday";
+      end if; 
+
+      print !,!;
+      exit;
+
 end main;
