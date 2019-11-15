@@ -1,0 +1,152 @@
+#===============================================================
+# File--------calendar.slic
+# Programmer--Bryan Crawley
+# Project-----Slic demo
+#
+# This program displays a calendar for a chosen month. The
+# user specifies the month and year as integers. The program
+# responds with a calendar for that month.
+#
+# Note: This program only works for the Gregorian calendar.
+#===============================================================
+
+main;
+
+   data:
+
+      integer: year;          # The 4-digit year adjusted for Zeller's congruence.
+      integer: displayYear;   # The 4-digit year as entered by the user.
+      integer: month;         # The month (1-12).
+      integer: day;           # Day of the month. Always 1 for this program.
+      integer: m, y, c;       # Variables for Zeller's Congruence.
+      integer: temp;          # An intermediate result in Zeller's Congruence.
+      integer: weekday;       # Day of the week for first day of month (0-6).
+      integer: count, i;      # Counters used in displaying the calendar.
+      integer: monthSize[13]; # A table for number of days in each month.
+
+   algorithm:
+
+      # Create a table for the number of days in each month.
+      monthSize[1] := 31;
+      monthSize[2] := 28;
+      monthSize[3] := 31;
+      monthSize[4] := 30;
+      monthSize[5] := 31;
+      monthSize[6] := 30;
+      monthSize[7] := 31;
+      monthSize[8] := 31;
+      monthSize[9] := 30;
+      monthSize[10] := 31;
+      monthSize[11] := 30;
+      monthSize[12] := 31;
+
+      # Fetch the user's input.
+      print !;
+      print "Month----";
+      read month;
+      print "Year-----";
+      read year;
+      print !;
+
+      day := 1; 
+      displayYear := year;
+
+      # Adjust the number of days in February for leap year.
+      if ((year-year/4*4)=0 & (year-year/100*100)<>0) | ((year-year/400*400)=0);
+         monthSize[2] := 29;
+      end if;
+
+      # Set variables for Zeller's Congruence.
+      if (month <= 2);
+         year := year - 1;
+         m := month + 12;
+      else;
+         m := month;
+      end if;
+
+      c := year/100;
+      y := year - (c*100);
+
+      # The basic formula for Zeller's Congruence...
+      temp := day + (m+1)*26/10 + y + y/4 + c/4 - 2*c + 7;
+      weekday := temp - temp/7*7;
+
+      # This "if" is necessary to make sure weekday is positive
+      # because we did a remainder instead of a true modulus.
+      if (weekday < 0);
+         weekday := weekday + 7;
+      end if;
+
+      # Adjust to wrap Saturday to day #6
+      if (weekday = 0);
+         weekday := 6;
+      else;
+         weekday := weekday - 1;
+      end if;
+     
+      # Display the title.
+      if (month = 1);
+         print "    January ";
+      end if;
+      if (month = 2);
+         print "   February ";
+      end if;
+      if (month = 3);
+         print "     March ";
+      end if;
+      if (month = 4);
+         print "     April ";
+      end if;
+      if (month = 5);
+         print "      May ";
+      end if;
+      if (month = 6);
+         print "     June ";
+      end if;
+      if (month = 7);
+         print "     July ";
+      end if;
+      if (month = 8);
+         print "     August ";
+      end if;
+      if (month = 9);
+         print "   September ";
+      end if;
+      if (month = 10);
+         print "    October ";
+      end if;
+      if (month = 11);
+         print "   November ";
+      end if;
+      if (month = 12);
+         print "   December ";
+      end if;
+      print displayYear, !;
+
+      # Display column headings.
+      print "Su Mo Tu We Th Fr Sa", !;
+
+      # Display the calendar.
+      count := 0;
+      counting i upward 1-weekday to monthSize[month];
+         if (i <= 0);
+            print "  ";
+         else;
+            if (i >= 1 & i <= 9);
+               print " ", i;
+            else;
+               print i;
+            end if;
+         end if;
+         count := count + 1;
+         count := count - count/7*7;
+         print " ";
+         if (count=0 & i<monthSize[month]);
+            print !;
+         end if;
+      end counting;
+
+      print !,!;
+      exit;
+
+end main;

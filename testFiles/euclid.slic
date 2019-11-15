@@ -1,0 +1,45 @@
+#==========================================================================
+# File--------euclid.slic
+# Programmer--Bryan Crawley
+# Project-----Euclid's Algorithm
+#
+# This program uses Euclid's Algorithm to compute the greatest common
+# divisor of any two positive integers.
+#==========================================================================
+
+main;
+data:
+    integer: a;       # One of the two integers.
+    integer: b;       # The other integer.
+    integer: d;       # Used for scratch work.
+    integer: temp;    # Used in exchanging a and b.
+    integer: asave;   # Save original value of a.
+    integer: bsave;   # Save original value of b.
+algorithm:
+    print !,!, "                      SLIC Demonstration", !;
+    print !, "This program uses Euclid's Algorithm to determine the  greatest";
+    print !, "common divisor of two positive integers.  It will prompt you to";
+    print !, "enter the two integers A and B, and  will display the result on";
+    print !, "the screen.  The program is written in SLIC,  a new programming";
+    print !, "language designed and implemented at Georgetown College.";
+    print !;
+    print !, "Enter A: ";
+    read asave;
+    print "Enter B: ";
+    read bsave;
+    a := asave;
+    b := bsave;
+    while (a<>b);
+	if (a<b);
+	   temp := a;
+	   a := b;
+	   b := temp;
+        end if;
+        d := a - b;
+	a := b;
+	b := d;
+    end while;
+    print !,"Greatest common divisor of ";
+    print asave, " and ", bsave, " is ", a, ".", !, !;
+    exit;
+end main;

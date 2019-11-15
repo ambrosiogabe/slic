@@ -26,6 +26,11 @@ static AstNode* initNode(NodeType type, int tokenIndex) {
 /* All the functions to create AstNodes
 /* ============================================================== */
 AstNode* makeCountingLoopNode(int tokenInfoIndex, AstNode* variable, int isUpward, AstNode* startExpr, AstNode* endExpr, AstNode* body) {
+    if (variable->as.variable.type == REAL) {
+        yyerrorInfo("Counting loops must have an integer variable!", tokenTable.table[variable->tokenInfoIndex]);
+        exit(-1);
+    }
+
     AstNode* newNode = initNode(COUNTING_LOOP_NODE, tokenInfoIndex);
     
     // Initialize easy stuff
@@ -106,8 +111,8 @@ AstNode* makeAssignmentNode(int tokenInfoIndex, char* name, AstNode* expr) {
     }
 
     AstNode* newNode = initNode(ASSIGN_STMT_NODE, tokenInfoIndex);
-    AstNode* varNode = makeVariableNode(tokenInfoIndex, name);
     newNode->as.assignStmt = malloc(sizeof(AssignStmt));
+    AstNode* varNode = makeVariableNode(tokenInfoIndex, name);
     newNode->as.assignStmt->variableNode = varNode;
     newNode->as.assignStmt->exprNode = expr;
     newNode->isFloaty = newNode->as.assignStmt->variableNode->as.variable.type == REAL;

@@ -1,0 +1,33 @@
+#--------------------------------------------------------------------------
+# File--------fact.slic
+# Programmer--Bryan Crawley
+# Project-----Factorial
+#
+# This program computes the factorial a positive integer that is entered
+# by the user at runtime.
+#--------------------------------------------------------------------------
+
+Main;
+
+   Data:
+      Integer: j,fact,n;
+
+   Algorithm:
+
+      # Enter the data.
+      Print !,"Factorial of: ";
+      Read n;
+
+      # Compute the factorial.
+      j := n;
+      fact := 1;
+      Counting j Upward 1 To n;
+         fact := fact * j;
+      End Counting;
+
+      # Display the result.
+      Print !,"Factorial of ", n, " is ", fact, ".", !, !;
+
+      Exit;
+
+End Main;

@@ -77,4 +77,7 @@ int yyerrorInfo(const char* s, TokenInformation token);
     }\
 }
 
+#define AS_ASSIGN_STMT(node) (node->as.assignStmt)
+#define AS_VARIABLE(node)    (node->as.variable)
+
 #endif

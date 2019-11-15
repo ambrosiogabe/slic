@@ -1,0 +1,69 @@
+#=================================================================
+# File--------peevedpigeons.slic
+# Programmer--Bryan Crawley
+# Project-----Peeved Pigeons
+#
+# Play the "Peeved Pigeons" game. This program originated as an
+# assignment in "Introduction to Programming". A pigeon uses a
+# slingshot to shoot a stone at an annoying pig.
+#=================================================================
+
+main;
+   data:
+      real: pigDistance;
+      real: angleDegrees;
+      real: angleRadians;
+      real: drawLength;
+      real: velocity;
+      real: miss;
+      real: result;
+      real: x, term, sine;
+      integer: n;
+      integer: offBy;
+
+   algorithm:
+      print !;
+      print "Distance to pig (feet) -------- ";
+      read pigDistance;
+      
+      while (1);  #Exit below when we hit the pig.
+         print !;
+         print "Angle of elevation (degrees) -- ";
+         read angleDegrees;
+         print "Draw length (inches) ---------- ";
+         read drawLength;
+
+         angleRadians := angleDegrees * 3.14159265 / 180;
+
+         # Compute the sine that we need for the stone trajectory.
+         x := 2 * angleRadians;
+         term := x;
+         sine := x;
+         n := 1;
+         while n <= 19;
+            n := n + 2;
+            term := -(term * x * x /(n-1)/n);
+            sine := sine + term;
+         end while;
+
+         # Apply some physics to compute the distance of the shot.
+         velocity := 10.0 * drawLength;
+         result := velocity * velocity * sine / 32.2;
+         miss := result - pigDistance; 
+
+         # Show the result of the shot.
+         print !;
+         if (miss >= -2.0) & (miss <= 2.0);
+            print "Result of shot ---------------- OINK!!", !, !;
+            exit;
+         end if;
+         if miss > 0;
+            offBy := miss - 2.0 + 0.5; #Round to nearest integer.
+            print "Result of shot ---------------- ", offBy, " feet too long", !;
+         else;
+            offBy := -miss - 2.0 + 0.5; #Round to nearest integer.
+            print "Result of shot ---------------- ", offBy, " feet too short", !;
+         end if;
+      end while;
+
+end main;

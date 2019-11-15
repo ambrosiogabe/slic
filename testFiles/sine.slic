@@ -1,0 +1,23 @@
+main;
+   data:
+      real: x;
+      real: sum;
+      real: term;
+      integer: n;
+   algorithm:
+      print "Enter x: ";
+      read x;
+
+      term := x;
+      sum := x;
+      n := 1;
+      while n <= 19;
+         n := n + 2;
+         term := 0 - term * x * x /(n-1)/n;
+         sum := sum + term;
+      end while;
+      
+      print "sin(", x, ") = ", sum, !;
+      exit;
+end main;
+

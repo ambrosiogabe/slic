@@ -7,6 +7,7 @@
 /* ============================================================== */
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "common.h"
 
 #include "compiler.h"
@@ -450,59 +451,87 @@ void freeInstructionContainer() {
     free(instructions.instructions);
 }
 
+// Helper function found on stack overflow to strip extension 
+// off of filename.
+static void strip_ext(char *fname)
+{
+    char *end = fname + strlen(fname);
+
+    while (end > fname && *end != '.' && *end != '\\' && *end != '/') {
+        --end;
+    }
+    if ((end > fname && *end == '.') &&
+        (*(end - 1) != '\\' && *(end - 1) != '/')) {
+        *end = '\0';
+    }  
+}
+
 static void generateCode() {
+    FILE* fp;
+    if (filename != NULL) {
+        char* dupFilename = strdup(filename);
+        strip_ext(dupFilename);
+        strcat(dupFilename, ".gstal");
+        fp = fopen(dupFilename, "w+");
+    } else {
+        fp = fopen("out.gstal", "w+");
+    }
+
     for (int i=0; i < instructions.size; i++) {
         Instruction instruction = instructions.instructions[i];
         switch(instruction.type) {
-            case ADI: printf("ADI\n"); break;
-            case ADF: printf("ADF\n"); break;
-            case SBI: printf("SBI\n"); break;
-            case SBF: printf("SBF\n"); break;
-            case MLI: printf("MLI\n"); break;
-            case MLF: printf("MLF\n"); break;
-            case DVI: printf("DVI\n"); break;
-            case DVF: printf("DVF\n"); break;
-            case NGI: printf("NGI\n"); break;
-            case NGF: printf("NGF\n"); break;
-            case EQI: printf("EQI\n"); break;
-            case EQF: printf("EQF\n"); break;
-            case NEI: printf("NEI\n"); break;
-            case NEF: printf("NEF\n"); break;
-            case LTI: printf("LTI\n"); break;
-            case LTF: printf("LTF\n"); break;
-            case LEI: printf("LEI\n"); break;
-            case LEF: printf("LEF\n"); break;
-            case GTI: printf("GTI\n"); break;
-            case GTF: printf("GTF\n"); break;
-            case GEI: printf("GEI\n"); break;
-            case GEF: printf("GEF\n"); break;
-            case FTI: printf("FTI\n"); break;
-            case ITF: printf("ITF\n"); break;
-            case PTI: printf("PTI\n"); break;
-            case PTF: printf("PTF\n"); break;
-            case PTC: printf("PTC\n"); break;
-            case PTL: printf("PTL\n"); break;
-            case INI: printf("INI\n"); break;
-            case INF: printf("INF\n"); break;
-            case LLI: printf("LLI %d\n", instruction.operand.ival); break;
-            case LLF: printf("LLF %f\n", instruction.operand.fval); break;
-            case ISP: printf("ISP %d\n", instruction.operand.ival); break;
-            case DSP: printf("DSP %d\n", instruction.operand.ival); break;
-            case STO: printf("STO\n"); break;
-            case STM: printf("STM\n"); break;
-            case LOD: printf("LOD\n"); break;
-            case LAA: printf("LAA %d\n", instruction.operand.ival); break;
-            case LRA: printf("LRA %d\n", instruction.operand.ival); break;
-            case JMP: printf("JMP %d\n", instruction.operand.ival); break;
-            case JPF: printf("JPF %d\n", instruction.operand.ival); break;
-            case PAR: printf("PAR %d\n", instruction.operand.ival); break;
-            case CAL: printf("CAL %d\n", instruction.operand.ival); break;
-            case RET: printf("RET\n"); break;
-            case NOP: printf("NOP\n"); break;
-            case HLT: printf("HLT\n"); break;
+            case ADI: fprintf(fp, "ADI\n"); break;
+            case ADF: fprintf(fp, "ADF\n"); break;
+            case SBI: fprintf(fp, "SBI\n"); break;
+            case SBF: fprintf(fp, "SBF\n"); break;
+            case MLI: fprintf(fp, "MLI\n"); break;
+            case MLF: fprintf(fp, "MLF\n"); break;
+            case DVI: fprintf(fp, "DVI\n"); break;
+            case DVF: fprintf(fp, "DVF\n"); break;
+            case NGI: fprintf(fp, "NGI\n"); break;
+            case NGF: fprintf(fp, "NGF\n"); break;
+            case EQI: fprintf(fp, "EQI\n"); break;
+            case EQF: fprintf(fp, "EQF\n"); break;
+            case NEI: fprintf(fp, "NEI\n"); break;
+            case NEF: fprintf(fp, "NEF\n"); break;
+            case LTI: fprintf(fp, "LTI\n"); break;
+            case LTF: fprintf(fp, "LTF\n"); break;
+            case LEI: fprintf(fp, "LEI\n"); break;
+            case LEF: fprintf(fp, "LEF\n"); break;
+            case GTI: fprintf(fp, "GTI\n"); break;
+            case GTF: fprintf(fp, "GTF\n"); break;
+            case GEI: fprintf(fp, "GEI\n"); break;
+            case GEF: fprintf(fp, "GEF\n"); break;
+            case FTI: fprintf(fp, "FTI\n"); break;
+            case ITF: fprintf(fp, "ITF\n"); break;
+            case PTI: fprintf(fp, "PTI\n"); break;
+            case PTF: fprintf(fp, "PTF\n"); break;
+            case PTC: fprintf(fp, "PTC\n"); break;
+            case PTL: fprintf(fp, "PTL\n"); break;
+            case INI: fprintf(fp, "INI\n"); break;
+            case INF: fprintf(fp, "INF\n"); break;
+            case LLI: fprintf(fp, "LLI %d\n", instruction.operand.ival); break;
+            case LLF: fprintf(fp, "LLF %f\n", instruction.operand.fval); break;
+            case ISP: fprintf(fp, "ISP %d\n", instruction.operand.ival); break;
+            case DSP: fprintf(fp, "DSP %d\n", instruction.operand.ival); break;
+            case STO: fprintf(fp, "STO\n"); break;
+            case STM: fprintf(fp, "STM\n"); break;
+            case LOD: fprintf(fp, "LOD\n"); break;
+            case LAA: fprintf(fp, "LAA %d\n", instruction.operand.ival); break;
+            case LRA: fprintf(fp, "LRA %d\n", instruction.operand.ival); break;
+            case JMP: fprintf(fp, "JMP %d\n", instruction.operand.ival); break;
+            case JPF: fprintf(fp, "JPF %d\n", instruction.operand.ival); break;
+            case PAR: fprintf(fp, "PAR %d\n", instruction.operand.ival); break;
+            case CAL: fprintf(fp, "CAL %d\n", instruction.operand.ival); break;
+            case RET: fprintf(fp, "RET\n"); break;
+            case NOP: fprintf(fp, "NOP\n"); break;
+            case HLT: fprintf(fp, "HLT\n"); break;
             default:
                 printf("Unkonwn instruction! %d", instruction.type);
+                fclose(fp);
                 exit(-1);
+                break;
         }
     }
+    fclose(fp);
 }

@@ -35,6 +35,7 @@ typedef struct {
 
 AstNode* astRootNode;
 InstructionContainer instructions;
+char* filename;
 
 void initInstructionContainer();
 void freeInstructionContainer();

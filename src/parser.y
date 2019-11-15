@@ -28,7 +28,7 @@
 
 #define DEBUG_PARSER 0
 
-int yyerror();
+int yyerror(const char* msg);
 int yyerrorInfo(const char* s, TokenInformation token);
 int yylex();
 
@@ -326,8 +326,8 @@ factor:
 
 %%
 
-int yyerror(const char* s) {
-	printf("Error: %s\nOn line:\n", s);
+int yyerror(const char* msg) {
+	printf("Error: %s\nOn line:\n", msg);
 	TokenInformation token = tokenTable.table[tokenTable.size - 1];
 	printf("\t%d.| %.*s\n", token.lineNumber, token.lineSize - 1, token.lineBeginning);
 

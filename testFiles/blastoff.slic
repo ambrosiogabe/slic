@@ -1,0 +1,13 @@
+main;
+   data:
+      integer: count;
+      integer: endit;
+   algorithm:
+      print !;
+      endit := 0;
+      counting count downward 10 to endit;
+         endit := -4;
+         print count, !;
+      end counting;
+      print "Blast off!", !, !;
+end main;
