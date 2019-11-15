@@ -55,22 +55,33 @@ typedef struct {
     unsigned int hashValue; // Used instead of string comparison
 } SymbolTableEntry;
 
+typedef struct {
+    SymbolTableEntry* symbols;
+    unsigned int size;
+    unsigned int capacity;
+    unsigned int nextAddress;
+    char* functionName;
+    unsigned int hashValue;
+} FunctionSymbolTable;
+
 /* =================================================================
 /* A SymbolTable is the container for all the symbol table entries.
 /* It contains the size and capacity for the symbol table at its
 /* current state.
 /* ================================================================= */
 typedef struct {
-    SymbolTableEntry* symbols;
+    FunctionSymbolTable** functionSymbols;
     unsigned int size;
     unsigned int capacity;
-    unsigned int nextAddress;
 } SymbolTable;
 
 SymbolTable symbolTable;
+FunctionSymbolTable* functionSymbolTable;
 
 void initSymbolTable();
 void freeSymbolTable();
+void insertFunctionSymbol(char* name);
+FunctionSymbolTable* getFunctionSymbol(char* name);
 void insertSymbolTable(DataType type, char* name, DataStructure structure, uint16_t size);
 SymbolTableEntry getSymbol(char* name);
 unsigned int hashVariableName(char* name); 

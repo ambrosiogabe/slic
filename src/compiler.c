@@ -370,8 +370,9 @@ void walkSyntaxTree() {
     }
 
     int offset = 0;
-    for (int i=0; i < symbolTable.size; i++) {
-        offset += symbolTable.symbols[i].size;
+    functionSymbolTable = symbolTable.functionSymbols[0];
+    for (int i=0; i < functionSymbolTable->size; i++) {
+        offset += functionSymbolTable->symbols[i].size;
     }
     insertIntInstruction(ISP, offset);
 

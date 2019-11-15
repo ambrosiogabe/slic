@@ -106,6 +106,16 @@
                                                         return(TO_RW);
                                                     }
 
+[pP][aA][rR][aA][mM][eE][tT][eE][rR]                {
+                                                        if (DEBUG) printf("Token: PARAM_RW %s\n", yytext);
+                                                        return (PARAM_RW);
+                                                    }
+
+[rR][eE][tT][uU][rR][nN]                            {
+                                                        if (DEBUG) printf("Token: RETURN_RW %s\n", yytext);
+                                                        return (RETURN_RW);
+                                                    }
+
 "!"                                                 {
                                                         if (DEBUG) printf("Token: BANG %s\n", yytext);
                                                         return(BANG);

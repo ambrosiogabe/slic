@@ -13,54 +13,98 @@
 #include "symbolTable.h"
 
 void initSymbolTable() {
-    symbolTable.nextAddress = 0;
     symbolTable.size = 0;
     symbolTable.capacity = 8;
-    symbolTable.symbols = (SymbolTableEntry*)malloc(symbolTable.capacity * sizeof(SymbolTableEntry));
+    symbolTable.functionSymbols = malloc(symbolTable.capacity * sizeof(FunctionSymbolTable));
+}
+
+void freeFunctionSymbolTable(FunctionSymbolTable* table) {
+    for (int i=0; i < table->size; i++) {
+        free(table->symbols[i].name);
+    }
+    free(table->symbols);
+    free(table);
 }
 
 void freeSymbolTable() {
     for (int i=0; i < symbolTable.size; i++) {
-        free(symbolTable.symbols[i].name);
+        freeFunctionSymbolTable(symbolTable.functionSymbols[i]);
     }
-    free(symbolTable.symbols);
+    free(symbolTable.functionSymbols);
 }
 
 static SymbolTableEntry makeSymbol(DataType type, char* name, DataStructure structure, uint16_t size) {
     SymbolTableEntry entry;
     entry.type = type;
     entry.name = name;
-    entry.address = symbolTable.nextAddress;
+    entry.address = functionSymbolTable->nextAddress;
     entry.structure = structure;
     entry.size = size;
     entry.hashValue = hashVariableName(name);
-    symbolTable.nextAddress += size;
+    functionSymbolTable->nextAddress += size;
 
     return entry;
 }
 
 void insertSymbolTable(DataType type, char* name, DataStructure structure, uint16_t size) {
     SymbolTableEntry entry = makeSymbol(type, name, structure, size);
-    if (symbolTable.size + 1 >= symbolTable.capacity) {
-        symbolTable.capacity *= 2;
-        symbolTable.symbols = realloc(symbolTable.symbols, symbolTable.capacity * sizeof(SymbolTableEntry));
+    if (functionSymbolTable->size + 1 >= functionSymbolTable->capacity) {
+        functionSymbolTable->capacity *= 2;
+        functionSymbolTable->symbols = realloc(functionSymbolTable->symbols, functionSymbolTable->capacity * sizeof(SymbolTableEntry));
     }
 
-    symbolTable.symbols[symbolTable.size] = entry;
+    functionSymbolTable->symbols[functionSymbolTable->size] = entry;
+    functionSymbolTable->size++;
+}
+
+static FunctionSymbolTable* makeFunctionSymbol(char* name) {
+    FunctionSymbolTable* table = malloc(sizeof(FunctionSymbolTable));
+    table->capacity = 8;
+    table->size = 0;
+    table->nextAddress = 0;
+    table->symbols = malloc(table->capacity * sizeof(SymbolTableEntry));
+    table->functionName = name;
+    table->hashValue = hashVariableName(name);
+    return table;
+}
+
+void insertFunctionSymbol(char* name) {
+    FunctionSymbolTable* table = makeFunctionSymbol(name);
+    if (symbolTable.size + 1 >= symbolTable.capacity) {
+        symbolTable.capacity *= 2;
+        symbolTable.functionSymbols = realloc(symbolTable.functionSymbols, symbolTable.capacity * sizeof(FunctionSymbolTable));
+    }
+    symbolTable.functionSymbols[symbolTable.size] = table;
     symbolTable.size++;
 }
 
 SymbolTableEntry getSymbol(char* name) {
     int hash = hashVariableName(name);
-    for (int i=0; i < symbolTable.size; i++) {
-        if (symbolTable.symbols[i].hashValue == hash && strcmp(name, symbolTable.symbols[i].name) == 0) {
-            return symbolTable.symbols[i];
+    if (functionSymbolTable != NULL) {
+        for (int i=0; i < functionSymbolTable->size; i++) {
+            if (functionSymbolTable->symbols[i].hashValue == hash && strcmp(name, functionSymbolTable->symbols[i].name) == 0) {
+                return functionSymbolTable->symbols[i];
+            }
         }
+    } else {
+        printf("Null function symbol table!\n");
+        exit(-1);
     }
     
     SymbolTableEntry badEntry;
     badEntry.address = 65535;
     return badEntry;
+}
+
+FunctionSymbolTable* getFunctionSymbol(char* name) {
+    int hash = hashVariableName(name);
+    for (int i=0; i < symbolTable.size; i++) {
+        if (symbolTable.functionSymbols[i]->hashValue == hash && strcmp(name, symbolTable.functionSymbols[i]->functionName) == 0) {
+            return symbolTable.functionSymbols[i];
+        }
+    }
+
+    return NULL;
 }
 
 unsigned int hashVariableName(char* name) {
@@ -72,17 +116,24 @@ unsigned int hashVariableName(char* name) {
 }
 
 void printSymbolTable() {
-	printf("|%11s|%11s|%11s|%11s|%11s|\n", "Type", "Name", "Address", "Size", "Structure");
-	for (int i=0; i < 61; i++) printf("=");
-	printf("\n");
+    FunctionSymbolTable* currentTable = NULL;
+    for (int i=0; i < symbolTable.size; i++) {
+        currentTable = symbolTable.functionSymbols[i];
+        printf("%s\n", currentTable->functionName);
+        printf("|%11s|%11s|%11s|%11s|%11s|\n", "Type", "Name", "Address", "Size", "Structure");
+        for (int i=0; i < 61; i++) printf("=");
+            printf("\n");
 
-	for (int i=0; i < symbolTable.size; i++) {
-		SymbolTableEntry entry = symbolTable.symbols[i];
-		char* type = entry.type == INT ? "integer" : "real";
-		char* structure = entry.structure == SCALAR ? "scalar" : "array"; 
+        for (int i=0; i < currentTable->size; i++) {
+            SymbolTableEntry entry = currentTable->symbols[i];
+            char* type = entry.type == INT ? "integer" : "real";
+            char* structure = entry.structure == SCALAR ? "scalar" : "array"; 
 
-		printf("|%11s|%11s|%11d|%11d|%11s|\n", type, entry.name, entry.address, entry.size, structure);
-		for (int i=0; i < 61; i++) printf("-");
-		printf("\n");
-	}
+            printf("|%11s|%11s|%11d|%11d|%11s|\n", type, entry.name, entry.address, entry.size, structure);
+            for (int i=0; i < 61; i++) printf("-");
+                printf("\n");
+        }
+        
+        printf("\n\n");
+    }
 }

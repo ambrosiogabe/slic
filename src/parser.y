@@ -60,6 +60,8 @@ static int previousTokenIndex = 0;
 %token <helper> UPWARD_RW
 %token <helper> DOWNWARD_RW
 %token <helper> TO_RW
+%token <helper> PARAM_RW
+%token <helper> RETURN_RW
 
 %token <helper> BANG
 %token <helper> SEMICOLON
@@ -117,11 +119,32 @@ static int previousTokenIndex = 0;
 %%
 
 program:   
-    mainBlock
+    functionList
 ;
 
-mainBlock:
-	MAIN_RW SEMICOLON dataBlock algorithmBlock END_RW MAIN_RW SEMICOLON
+functionList:
+	  function functionList 
+	| function
+;
+
+function: 
+	  VARIABLE 
+	  {
+	  	  insertFunctionSymbol($1.sval);
+	  	  functionSymbolTable = getFunctionSymbol($1.sval);
+	  }
+	  SEMICOLON parameterBlock dataBlock algorithmBlock END_RW VARIABLE SEMICOLON
+
+	| MAIN_RW
+	  {
+		  insertFunctionSymbol("main");
+		  functionSymbolTable = getFunctionSymbol("main");
+	  }
+	  SEMICOLON dataBlock algorithmBlock END_RW MAIN_RW SEMICOLON 
+;
+
+parameterBlock:
+	PARAM_RW COLON declarationStmtList
 ;
 
 dataBlock:

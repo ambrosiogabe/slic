@@ -135,6 +135,7 @@ int main(int argc, char** argv)
 		return -1;
 	}
 
+	printSymbolTable();
 	// Walk syntax tree and generate code
 	walkSyntaxTree();
 

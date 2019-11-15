@@ -61,36 +61,38 @@ extern int yydebug;
     UPWARD_RW = 271,
     DOWNWARD_RW = 272,
     TO_RW = 273,
-    BANG = 274,
-    SEMICOLON = 275,
-    COLON = 276,
-    COMMA = 277,
-    LEFT_BRACKET = 278,
-    RIGHT_BRACKET = 279,
-    LEFT_PAREN = 280,
-    RIGHT_PAREN = 281,
-    LEFT_BRACE = 282,
-    RIGHT_BRACE = 283,
-    MULTIPLY_TOKEN = 284,
-    DIVIDE_TOKEN = 285,
-    MINUS_TOKEN = 286,
-    PLUS_TOKEN = 287,
-    MODULUS_TOKEN = 288,
-    LESS_THAN_TOKEN = 289,
-    LESS_THAN_EQUAL_TOKEN = 290,
-    GRT_THAN_TOKEN = 291,
-    GRT_THAN_EQUAL_TOKEN = 292,
-    EQUAL_TOKEN = 293,
-    NOT_EQUAL_TOKEN = 294,
-    AND_TOKEN = 295,
-    OR_TOKEN = 296,
-    NOT_TOKEN = 297,
-    ASSIGN_TOKEN = 298,
-    REAL_NUMBER = 299,
-    INTEGER = 300,
-    VARIABLE = 301,
-    STRING = 302,
-    NEWLINE = 303
+    PARAM_RW = 274,
+    RETURN_RW = 275,
+    BANG = 276,
+    SEMICOLON = 277,
+    COLON = 278,
+    COMMA = 279,
+    LEFT_BRACKET = 280,
+    RIGHT_BRACKET = 281,
+    LEFT_PAREN = 282,
+    RIGHT_PAREN = 283,
+    LEFT_BRACE = 284,
+    RIGHT_BRACE = 285,
+    MULTIPLY_TOKEN = 286,
+    DIVIDE_TOKEN = 287,
+    MINUS_TOKEN = 288,
+    PLUS_TOKEN = 289,
+    MODULUS_TOKEN = 290,
+    LESS_THAN_TOKEN = 291,
+    LESS_THAN_EQUAL_TOKEN = 292,
+    GRT_THAN_TOKEN = 293,
+    GRT_THAN_EQUAL_TOKEN = 294,
+    EQUAL_TOKEN = 295,
+    NOT_EQUAL_TOKEN = 296,
+    AND_TOKEN = 297,
+    OR_TOKEN = 298,
+    NOT_TOKEN = 299,
+    ASSIGN_TOKEN = 300,
+    REAL_NUMBER = 301,
+    INTEGER = 302,
+    VARIABLE = 303,
+    STRING = 304,
+    NEWLINE = 305
   };
 #endif
 /* Tokens.  */
@@ -110,36 +112,38 @@ extern int yydebug;
 #define UPWARD_RW 271
 #define DOWNWARD_RW 272
 #define TO_RW 273
-#define BANG 274
-#define SEMICOLON 275
-#define COLON 276
-#define COMMA 277
-#define LEFT_BRACKET 278
-#define RIGHT_BRACKET 279
-#define LEFT_PAREN 280
-#define RIGHT_PAREN 281
-#define LEFT_BRACE 282
-#define RIGHT_BRACE 283
-#define MULTIPLY_TOKEN 284
-#define DIVIDE_TOKEN 285
-#define MINUS_TOKEN 286
-#define PLUS_TOKEN 287
-#define MODULUS_TOKEN 288
-#define LESS_THAN_TOKEN 289
-#define LESS_THAN_EQUAL_TOKEN 290
-#define GRT_THAN_TOKEN 291
-#define GRT_THAN_EQUAL_TOKEN 292
-#define EQUAL_TOKEN 293
-#define NOT_EQUAL_TOKEN 294
-#define AND_TOKEN 295
-#define OR_TOKEN 296
-#define NOT_TOKEN 297
-#define ASSIGN_TOKEN 298
-#define REAL_NUMBER 299
-#define INTEGER 300
-#define VARIABLE 301
-#define STRING 302
-#define NEWLINE 303
+#define PARAM_RW 274
+#define RETURN_RW 275
+#define BANG 276
+#define SEMICOLON 277
+#define COLON 278
+#define COMMA 279
+#define LEFT_BRACKET 280
+#define RIGHT_BRACKET 281
+#define LEFT_PAREN 282
+#define RIGHT_PAREN 283
+#define LEFT_BRACE 284
+#define RIGHT_BRACE 285
+#define MULTIPLY_TOKEN 286
+#define DIVIDE_TOKEN 287
+#define MINUS_TOKEN 288
+#define PLUS_TOKEN 289
+#define MODULUS_TOKEN 290
+#define LESS_THAN_TOKEN 291
+#define LESS_THAN_EQUAL_TOKEN 292
+#define GRT_THAN_TOKEN 293
+#define GRT_THAN_EQUAL_TOKEN 294
+#define EQUAL_TOKEN 295
+#define NOT_EQUAL_TOKEN 296
+#define AND_TOKEN 297
+#define OR_TOKEN 298
+#define NOT_TOKEN 299
+#define ASSIGN_TOKEN 300
+#define REAL_NUMBER 301
+#define INTEGER 302
+#define VARIABLE 303
+#define STRING 304
+#define NEWLINE 305
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -151,7 +155,7 @@ union YYSTYPE
    AstNode* node;
    TokenHelper helper;
 
-#line 155 "src/generated/y.tab.h" /* yacc.c:1909  */
+#line 159 "src/generated/y.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

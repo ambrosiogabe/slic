@@ -28,6 +28,9 @@ slic: classLex.yy.c
 pretty: mkdirs mvFiles lex.yy.c 
 	${CC} -DPRETTY -o bin/slic.exe src/symbolTable.c src/abstractSyntaxTree.c src/compiler.c src/common.c src/generated/lex.yy.c src/generated/y.tab.c src/main.c ${LEXLIB}
 
+debug: mkdirs mvFiles lex.yy.c 
+	${CC} -DPRETTY -o debug/slic.exe src/symbolTable.c src/abstractSyntaxTree.c src/compiler.c src/common.c src/generated/lex.yy.c src/generated/y.tab.c src/main.c -g ${LEXLIB}
+
 classLex.yy.c: classBison.y
 	${LEX} ${CLASS_FLEXOPTS} scanner.l
 
@@ -41,6 +44,7 @@ bison.y:
 	bison ${YACCOPTS} src/parser.y
 
 mkdirs:
+	mkdir -p debug
 	mkdir -p src
 	mkdir -p bin
 	mkdir -p src/generated
