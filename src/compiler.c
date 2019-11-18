@@ -594,6 +594,7 @@ static void generateCode() {
         strip_ext(dupFilename);
         strcat(dupFilename, ".gstal");
         fp = fopen(dupFilename, "w+");
+        free(dupFilename);
     } else {
         fp = fopen("out.gstal", "w+");
     }

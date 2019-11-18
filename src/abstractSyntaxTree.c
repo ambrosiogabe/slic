@@ -18,6 +18,7 @@ static AstNode* initNode(NodeType type, int tokenIndex) {
     AstNode* newNode = malloc(sizeof(AstNode));
     newNode->type = type;
     newNode->tokenInfoIndex = tokenIndex;
+    newNode->isFloaty = 0;
 
     return newNode;
 }
@@ -560,10 +561,12 @@ static void freeExprNode(AstNode* node) {
     freeNode(expr->rightExpr);
 
     free(expr);
+    free(node);
 }
 
 static void freePrintExprNode(AstNode* node) {
     freeNode(node->as.printExpr->printExpr);
+    free(node->as.printExpr);
     free(node);
     node = NULL;
 }
@@ -571,6 +574,7 @@ static void freePrintExprNode(AstNode* node) {
 static void freeUnaryExprNode(AstNode* node) {
     UnaryExpr* expr = node->as.unaryExpr;
     freeNode(expr->expr);
+    free(node->as.unaryExpr);
 
     free(node);
     node = NULL;

@@ -147,7 +147,6 @@ int main(int argc, char** argv)
 	if (filename != NULL) free(filename);
 	if (yyin != stdin && yyin != NULL) {
 		fclose(yyin);
-		free(yyin);
 	}
 
    	return 0;
