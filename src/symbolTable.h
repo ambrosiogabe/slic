@@ -12,7 +12,6 @@
 /* Programmer: Gabe Ambrosio
 /* 
 /* ============================================================================== */
-
 #include <stdint.h>
 
 /* =================================================================
@@ -52,6 +51,7 @@ typedef struct {
     uint16_t address;
     DataStructure structure;
     uint16_t size;
+    uint16_t isParameter;
     unsigned int hashValue; // Used instead of string comparison
 } SymbolTableEntry;
 
@@ -61,6 +61,8 @@ typedef struct {
     unsigned int capacity;
     unsigned int nextAddress;
     char* functionName;
+    int functionLine;
+    int returnsAValue;
     unsigned int hashValue;
 } FunctionSymbolTable;
 
@@ -83,8 +85,14 @@ void freeSymbolTable();
 void insertFunctionSymbol(char* name);
 FunctionSymbolTable* getFunctionSymbol(char* name);
 void insertSymbolTable(DataType type, char* name, DataStructure structure, uint16_t size);
+void insertParameterSymbolTable(DataType type, char* name, DataStructure structure, uint16_t size);
 SymbolTableEntry getSymbol(char* name);
 unsigned int hashVariableName(char* name); 
+int getParameterLength(char* name);
+int getVariableLength(char* name);
+void setFunctionSymbolLine(char* funcName, int line);
+int getFunctionSymbolLine(char* funcName);
 void printSymbolTable();
+void functionReturnsSymbol(char* funcName);
 
 #endif

@@ -13,6 +13,7 @@
  */
 
 #include <stdio.h>
+#include <string.h>
 
 #ifdef PRETTY
 	#include "../symbolTable.h"
@@ -34,6 +35,7 @@ int yylex();
 
 DataType currentType;
 static int previousTokenIndex = 0;
+int isParameter = 0;
 
 %}
 
@@ -115,6 +117,10 @@ static int previousTokenIndex = 0;
 %type <node> countingLoop;
 %type <node> readStmt;
 %type <node> exitStmt;
+%type <node> functionCall;
+%type <node> functionCallStmt;
+%type <node> variableList;
+%type <node> returnStmt;
 
 %%
 
@@ -129,26 +135,64 @@ functionList:
 
 function: 
 	  VARIABLE 
-	  {
-	  	  insertFunctionSymbol($1.sval);
-	  	  functionSymbolTable = getFunctionSymbol($1.sval);
-	  }
+		{
+			if (getFunctionSymbol("main") == NULL) {
+				yyerrorInfo("main function must be first function in file!", tokenTable.table[$1.tokenIndex]);
+				exit(-1);
+			}
+
+			insertFunctionSymbol($1.sval);
+			functionSymbolTable = getFunctionSymbol($1.sval);
+			AstNode* lastNode = astRootNode;
+			while (lastNode->next != NULL) {
+				lastNode = lastNode->next;
+			}
+			AstNode* functionNode = makeFunctionNode($1.tokenIndex);
+			functionNode->next = NULL;
+			lastNode->next = functionNode;
+		}
 	  SEMICOLON parameterBlock dataBlock algorithmBlock END_RW VARIABLE SEMICOLON
+		{
+			AstNode* lastNode = astRootNode;
+			while (lastNode->next != NULL) {
+				lastNode = lastNode->next;
+			}
+			AstNode* exitNode = makeExitNode($7.tokenIndex);
+			AstNode* endOfFunction = makeEndOfFunctionNode($1.tokenIndex, $1.sval);
+			lastNode->next = endOfFunction;
+			endOfFunction->next = exitNode;
+			exitNode->next = NULL;
+
+			if (strcmp($1.sval, $8.sval) != 0) {
+				yyerrorInfo("end 'functionName' must match 'functionName'", tokenTable.table[$8.tokenIndex]);
+			}
+	  	}
 
 	| MAIN_RW
-	  {
-		  insertFunctionSymbol("main");
-		  functionSymbolTable = getFunctionSymbol("main");
-	  }
+		{
+			insertFunctionSymbol("main");
+			functionSymbolTable = getFunctionSymbol("main");
+		}
 	  SEMICOLON dataBlock algorithmBlock END_RW MAIN_RW SEMICOLON 
+	  	{
+			AstNode* lastNode = astRootNode;
+			while (lastNode->next != NULL) {
+				lastNode = lastNode->next;
+			}
+			AstNode* exitNode = makeExitNode($6.tokenIndex);
+			exitNode->next = NULL;
+			lastNode->next = exitNode;
+	  	}
 ;
 
 parameterBlock:
-	PARAM_RW COLON declarationStmtList
+	  PARAM_RW COLON { isParameter = 1; } declarationStmtList { isParameter = 0; }
+	| PARAM_RW COLON
 ;
 
 dataBlock:
 	  DATA_RW COLON declarationStmtList
+	| DATA_RW COLON
 ;
 
 algorithmBlock:
@@ -176,15 +220,25 @@ declarationItem:
 														yyerrorInfo("Duplicate variable declaration.", tokenTable.table[$1.tokenIndex]);
 														YYERROR;
 													}
-													insertSymbolTable(currentType, $1.sval, SCALAR, 1);
+													if (!isParameter)
+														insertSymbolTable(currentType, $1.sval, SCALAR, 1);
+													else 
+														insertParameterSymbolTable(currentType, $1.sval, SCALAR, 1);
 												}
 	| VARIABLE LEFT_BRACKET INTEGER RIGHT_BRACKET    
 												{
+													if (isParameter) {
+														yyerrorInfo("Cannot use array as paramter for a function!", tokenTable.table[$1.tokenIndex]);
+														YYERROR;
+													}
 													if (getSymbol($1.sval).address != 65535) {
 														yyerrorInfo("Duplicate variable declaration.", tokenTable.table[$1.tokenIndex]);
 														YYERROR;
 													}
-													insertSymbolTable(currentType, $1.sval, ARRAY, $3.ival);
+													if (!isParameter)
+														insertSymbolTable(currentType, $1.sval, ARRAY, $3.ival);
+													else 
+														insertParameterSymbolTable(currentType, $1.sval, ARRAY, $3.ival);
 												}
 ;
 
@@ -241,6 +295,27 @@ stmt:
 	| countingLoop                 { $$ = $1; }
 	| readStmt                     { $$ = $1; }
 	| exitStmt                     { $$ = $1; }
+	| functionCallStmt             { $$ = $1; }
+	| returnStmt                   { $$ = $1; }
+;
+
+returnStmt:
+	RETURN_RW expr SEMICOLON { $$ = makeReturnNode($1.tokenIndex, $2, functionSymbolTable->functionName); }
+;
+
+functionCallStmt:
+	  VARIABLE LEFT_PAREN variableList RIGHT_PAREN SEMICOLON { $$ = makeFunctionCallNode($1.tokenIndex, $1.sval, $3); }
+	| VARIABLE LEFT_PAREN RIGHT_PAREN SEMICOLON		         { $$ = makeFunctionCallNode($1.tokenIndex, $1.sval, NULL); }
+;
+
+functionCall:
+	  VARIABLE LEFT_PAREN variableList RIGHT_PAREN { $$ = makeFunctionCallNode($1.tokenIndex, $1.sval, $3); }
+	| VARIABLE LEFT_PAREN RIGHT_PAREN              { $$ = makeFunctionCallNode($1.tokenIndex, $1.sval, NULL); }
+;
+
+variableList:
+	  expr COMMA variableList { $$ = $1; $$->next = $3; }
+	| expr                    { $$ = $1; $$->next = NULL; }
 ;
 
 exitStmt:
@@ -340,10 +415,11 @@ unary:
 
 factor: 
 	  VARIABLE                                   { $$ = makeVariableNode($1.tokenIndex, $1.sval); }
+	| functionCall                               { $$ = $1; }
 	| VARIABLE LEFT_BRACKET expr RIGHT_BRACKET   { $$ = makeArrayLoadNode($1.tokenIndex, $1.sval, $3); }
-	| REAL_NUMBER                                {$$ = makeFloatValueNode($1.tokenIndex, $1.rval);}
-	| INTEGER                                    {$$ = makeIntValueNode($1.tokenIndex, $1.ival);}
-	| LEFT_PAREN expr RIGHT_PAREN                {$$ = $2;}
+	| REAL_NUMBER                                { $$ = makeFloatValueNode($1.tokenIndex, $1.rval);}
+	| INTEGER                                    { $$ = makeIntValueNode($1.tokenIndex, $1.ival);}
+	| LEFT_PAREN expr RIGHT_PAREN                { $$ = $2;}
 ;
 
 
@@ -362,6 +438,7 @@ int yyerror(const char* msg) {
 
 	printf("\t   %*c", token.column + numSize, ' ');
 	printf("^-- Here.\n");
+	errorOccurred = 1;
  	return 0;
 }
 
@@ -377,5 +454,6 @@ int yyerrorInfo(const char* s, TokenInformation token) {
 
 	printf("\t   %*c", token.column + numSize, ' ');
 	printf("^-- Here.\n");
+	errorOccurred = 1;
  	return 0;
 }

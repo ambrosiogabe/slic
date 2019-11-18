@@ -150,7 +150,7 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 42 "src/parser.y" /* yacc.c:1909  */
+#line 48 "src/parser.y" /* yacc.c:1909  */
 
    AstNode* node;
    TokenHelper helper;

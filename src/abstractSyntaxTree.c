@@ -25,10 +25,40 @@ static AstNode* initNode(NodeType type, int tokenIndex) {
 /* ==============================================================
 /* All the functions to create AstNodes
 /* ============================================================== */
+AstNode* makeReturnNode(int tokenInfoIndex, AstNode* expr, char* funcName) {
+    AstNode* newNode = initNode(RETURN_NODE, tokenInfoIndex);
+    newNode->as.returnNode = malloc(sizeof(ReturnNode));
+    newNode->as.returnNode->expr = expr;
+    newNode->as.returnNode->funcName = funcName;
+
+    return newNode;
+}
+
+AstNode* makeEndOfFunctionNode(int tokenInfoIndex, char* funcName) {
+    AstNode* newNode = initNode(END_OF_FUNCTION_NODE, tokenInfoIndex);
+    newNode->as.endOfFunction = malloc(sizeof(EndOfFunctionNode));
+    newNode->as.endOfFunction->funcName = funcName;
+
+    return newNode;
+}
+
+AstNode* makeFunctionCallNode(int tokenInfoIndex, char* funcName, AstNode* variableList) {
+    AstNode* newNode = initNode(FUNCTION_CALL_NODE, tokenInfoIndex);
+    newNode->as.functionCall = malloc(sizeof(FunctionCallNode));
+    newNode->as.functionCall->funcName = funcName;
+    newNode->as.functionCall->variableList = variableList;
+
+    return newNode;
+}
+
+AstNode* makeFunctionNode(int tokenInfoIndex) {
+    AstNode* newNode = initNode(FUNCTION_NODE, tokenInfoIndex);
+    return newNode;
+}
+
 AstNode* makeCountingLoopNode(int tokenInfoIndex, AstNode* variable, int isUpward, AstNode* startExpr, AstNode* endExpr, AstNode* body) {
     if (variable->as.variable.type == REAL) {
         yyerrorInfo("Counting loops must have an integer variable!", tokenTable.table[variable->tokenInfoIndex]);
-        exit(-1);
     }
 
     AstNode* newNode = initNode(COUNTING_LOOP_NODE, tokenInfoIndex);
@@ -107,7 +137,6 @@ AstNode* makeReadArrayNode(int tokenInfoIndex, char* name, AstNode* expr) {
 AstNode* makeAssignmentNode(int tokenInfoIndex, char* name, AstNode* expr) {
     if (!IS_TYPE_OF_EXPR(*expr)) {
         yyerrorInfo("You can only assign an expression to a variable!", tokenTable.table[expr->tokenInfoIndex]);
-        exit(-1);
     }
 
     AstNode* newNode = initNode(ASSIGN_STMT_NODE, tokenInfoIndex);
@@ -123,11 +152,9 @@ AstNode* makeAssignmentNode(int tokenInfoIndex, char* name, AstNode* expr) {
 AstNode* makeArrayAssignmentNode(int tokenInfoIndex, char* name, AstNode* indexExpr, AstNode* valExpr) {
     if (!IS_TYPE_OF_EXPR(*indexExpr)) {
         yyerrorInfo("You can only use expressions as indices in arrays!", tokenTable.table[indexExpr->tokenInfoIndex]);
-        exit(-1);
     }
     if (!IS_TYPE_OF_EXPR(*valExpr)) {
         yyerrorInfo("You can only assign expressions to variables!", tokenTable.table[valExpr->tokenInfoIndex]);
-        exit(-1);
     }
 
     AstNode* newNode = initNode(ARRAY_ASSIGN_STMT_NODE, tokenInfoIndex);
@@ -149,7 +176,6 @@ AstNode* makeExprNode(int tokenInfoIndex, ExprOp op, AstNode* leftExpr, AstNode*
 
     if (!IS_TYPE_OF_EXPR(*leftExpr) || !IS_TYPE_OF_EXPR(*rightExpr)) {
         yyerrorInfo("You can only have a variable, literal, or expression inside an expression!", tokenTable.table[leftExpr->tokenInfoIndex]);
-        exit(-1);
     }
     newNode->as.expression->leftExpr = leftExpr;
     newNode->as.expression->rightExpr = rightExpr;
@@ -221,10 +247,12 @@ AstNode* makeVariableNode(int tokenInfoIndex, char* name) {
     SymbolTableEntry symEntry = getSymbol(name);
     if (symEntry.address == 65535) {
         yyerrorInfo("Undeclared variable!", tokenTable.table[tokenInfoIndex]);
-        exit(-1);
     }
 
     AstNode* newNode = initNode(VARIABLE_NODE, tokenInfoIndex);
+    if (symEntry.isParameter == 0) {
+        symEntry.address = symEntry.address - getParameterLength(functionSymbolTable->functionName);
+    }
     newNode->as.variable = symEntry;
     newNode->isFloaty = symEntry.type == REAL;
 
@@ -240,7 +268,6 @@ AstNode* makeArrayLoadNode(int tokenInfoIndex, char* name, AstNode* indexExpr) {
     SymbolTableEntry symEntry = getSymbol(name);
     if (symEntry.address == 65535) {
         yyerrorInfo("Undeclared variable!", tokenTable.table[tokenInfoIndex]);
-        exit(-1);
     }
 
     AstNode* newNode = initNode(ARRAY_LOAD_NODE, tokenInfoIndex);
@@ -276,6 +303,10 @@ static void freeCountingLoop(AstNode* node);
 static void freeReadNode(AstNode* node);
 static void freeReadArrayNode(AstNode* node);
 static void freeExitNode(AstNode* node);
+static void freeFunctionNode(AstNode* node);
+static void freeEndOfFunctionNode(AstNode* node);
+static void freeFunctionCallNode(AstNode* node);
+static void freeReturnNode(AstNode* node);
 
 static void freeNode(AstNode* node) {
     switch(node->type) {
@@ -330,6 +361,18 @@ static void freeNode(AstNode* node) {
         case EXIT_NODE:
             freeExitNode(node);
             break;
+        case FUNCTION_NODE:
+            freeFunctionNode(node);
+            break;
+        case END_OF_FUNCTION_NODE:
+            freeEndOfFunctionNode(node);
+            break;
+        case FUNCTION_CALL_NODE:
+            freeFunctionCallNode(node);
+            break;
+        case RETURN_NODE:
+            freeReturnNode(node);
+            break;
         default:
             printf("Do not know how to free memory for: %d", node->type);
             break;
@@ -348,6 +391,37 @@ void freeAst() {
         freeNode(currentNode);
         currentNode = tmp;
     }
+}
+
+static void freeReturnNode(AstNode* node) {
+    freeNode(node->as.returnNode->expr);
+    free(node->as.returnNode);
+    free(node);
+    node = NULL;
+}
+
+static void freeFunctionNode(AstNode* node) {
+    free(node);
+    node = NULL;
+}
+
+static void freeFunctionCallNode(AstNode* node) {
+    AstNode* current = node->as.functionCall->variableList;
+    while (current != NULL) {
+        AstNode* tmp = current->next;
+        freeNode(current);
+        current = tmp;
+    }
+    free(node->as.functionCall);
+
+    free(node);
+    node = NULL;
+}
+
+static void freeEndOfFunctionNode(AstNode* node) {
+    free(node->as.endOfFunction);
+    free(node);
+    node = NULL;
 }
 
 static void freeExitNode(AstNode* node) {

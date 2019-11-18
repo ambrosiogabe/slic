@@ -540,6 +540,10 @@ char *yytext;
     * ======================================================================*/
     #define DEBUG 0
 
+    #ifdef MEMLEAK
+        #include "../vendor/CMemLeak.h"
+    #endif
+
     #ifdef PRETTY
         #include "../abstractSyntaxTree.h"
         #include "../common.h"
@@ -553,8 +557,8 @@ char *yytext;
 
     #include <stdio.h>
     #include <string.h>
-#line 556 "src/generated/lex.yy.c"
-#line 557 "src/generated/lex.yy.c"
+#line 560 "src/generated/lex.yy.c"
+#line 561 "src/generated/lex.yy.c"
 
 #define INITIAL 0
 
@@ -771,9 +775,9 @@ YY_DECL
 		}
 
 	{
-#line 26 "src/scanner.l"
+#line 30 "src/scanner.l"
 
-#line 776 "src/generated/lex.yy.c"
+#line 780 "src/generated/lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -832,12 +836,12 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 27 "src/scanner.l"
+#line 31 "src/scanner.l"
 
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 29 "src/scanner.l"
+#line 33 "src/scanner.l"
 {
                                                         if (DEBUG) printf("Token: MAIN_RW %s\n", yytext);
                                                         return(MAIN_RW);
@@ -845,7 +849,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 34 "src/scanner.l"
+#line 38 "src/scanner.l"
 {
                                                         if (DEBUG) printf("Token: END_RW %s\n", yytext);
                                                         return(END_RW);
@@ -853,7 +857,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 39 "src/scanner.l"
+#line 43 "src/scanner.l"
 {
                                                         if (DEBUG) printf("Token: DATA_RW %s\n", yytext);
                                                         return(DATA_RW);
@@ -861,7 +865,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 44 "src/scanner.l"
+#line 48 "src/scanner.l"
 {
                                                         if (DEBUG) printf("Token: ALGORITHM_RW %s\n", yytext);
                                                         return(ALGORITHM_RW);
@@ -869,7 +873,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 49 "src/scanner.l"
+#line 53 "src/scanner.l"
 {
                                                         if (DEBUG) printf("Token: EXIT_RW %s\n", yytext);
                                                         return(EXIT_RW);
@@ -877,7 +881,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 54 "src/scanner.l"
+#line 58 "src/scanner.l"
 {
                                                         if (DEBUG) printf("Token: READ_RW %s\n", yytext);
                                                         return(READ_RW);
@@ -885,7 +889,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 59 "src/scanner.l"
+#line 63 "src/scanner.l"
 {
                                                         if (DEBUG) printf("Token: PRINT_RW %s\n", yytext);
                                                         return(PRINT_RW);
@@ -893,7 +897,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 64 "src/scanner.l"
+#line 68 "src/scanner.l"
 {
                                                         if (DEBUG) printf("Token: REAL_RW %s\n", yytext);
                                                         return(REAL_RW);
@@ -901,7 +905,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 69 "src/scanner.l"
+#line 73 "src/scanner.l"
 {
                                                         if (DEBUG) printf("Token: INTEGER_RW %s\n", yytext);
                                                         return(INTEGER_RW);
@@ -909,7 +913,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 74 "src/scanner.l"
+#line 78 "src/scanner.l"
 {
                                                         if (DEBUG) printf("Token: WHILE_RW %s\n", yytext);
                                                         return(WHILE_RW);
@@ -917,7 +921,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 79 "src/scanner.l"
+#line 83 "src/scanner.l"
 {
                                                         if (DEBUG) printf("Token: IF_RW %s\n", yytext);
                                                         return(IF_RW);
@@ -925,7 +929,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 84 "src/scanner.l"
+#line 88 "src/scanner.l"
 {
                                                         if (DEBUG) printf("Token: ELSE_RW %s\n", yytext);
                                                         return(ELSE_RW);
@@ -933,7 +937,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 89 "src/scanner.l"
+#line 93 "src/scanner.l"
 {
                                                         if (DEBUG) printf("Token: COUNTING_RW %s\n", yytext);
                                                         return(COUNTING_RW);
@@ -941,7 +945,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 94 "src/scanner.l"
+#line 98 "src/scanner.l"
 {
                                                         if (DEBUG) printf("Token: UPWARD_RW %s\n", yytext);
                                                         return(UPWARD_RW);
@@ -949,7 +953,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 99 "src/scanner.l"
+#line 103 "src/scanner.l"
 {
                                                         if (DEBUG) printf("Token: DOWNWARD_RW %s\n", yytext);
                                                         return(DOWNWARD_RW);
@@ -957,7 +961,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 104 "src/scanner.l"
+#line 108 "src/scanner.l"
 {
                                                         if (DEBUG) printf("Token: TO_RW %s\n", yytext);
                                                         return(TO_RW);
@@ -965,7 +969,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 109 "src/scanner.l"
+#line 113 "src/scanner.l"
 {
                                                         if (DEBUG) printf("Token: PARAM_RW %s\n", yytext);
                                                         return (PARAM_RW);
@@ -973,7 +977,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 114 "src/scanner.l"
+#line 118 "src/scanner.l"
 {
                                                         if (DEBUG) printf("Token: RETURN_RW %s\n", yytext);
                                                         return (RETURN_RW);
@@ -981,7 +985,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 119 "src/scanner.l"
+#line 123 "src/scanner.l"
 {
                                                         if (DEBUG) printf("Token: BANG %s\n", yytext);
                                                         return(BANG);
@@ -989,7 +993,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 124 "src/scanner.l"
+#line 128 "src/scanner.l"
 {
                                                         if (DEBUG) printf("Token: SEMICOLON %s\n", yytext);
                                                         return(SEMICOLON);
@@ -997,7 +1001,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 129 "src/scanner.l"
+#line 133 "src/scanner.l"
 {
                                                         if (DEBUG) printf("Token: COLON %s\n", yytext);
                                                         return(COLON);
@@ -1005,7 +1009,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 134 "src/scanner.l"
+#line 138 "src/scanner.l"
 {
                                                         if (DEBUG) printf("Token: COMMA %s\n", yytext);
                                                         return(COMMA);
@@ -1013,7 +1017,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 139 "src/scanner.l"
+#line 143 "src/scanner.l"
 {
                                                         if (DEBUG) printf("Token: LEFT_BRACKET %s\n", yytext);
                                                         return(LEFT_BRACKET);
@@ -1021,7 +1025,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 144 "src/scanner.l"
+#line 148 "src/scanner.l"
 {
                                                         if (DEBUG) printf("Token: RIGHT_BRACKET %s\n", yytext);
                                                         return(RIGHT_BRACKET);
@@ -1029,7 +1033,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 149 "src/scanner.l"
+#line 153 "src/scanner.l"
 {
                                                         if (DEBUG) printf("Token: LEFT_PAREN %s\n", yytext);
                                                         return(LEFT_PAREN);
@@ -1037,7 +1041,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 154 "src/scanner.l"
+#line 158 "src/scanner.l"
 {
                                                         if (DEBUG) printf("Token: RIGHT_PAREN %s\n", yytext);
                                                         return(RIGHT_PAREN);
@@ -1045,7 +1049,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 159 "src/scanner.l"
+#line 163 "src/scanner.l"
 {
                                                         if (DEBUG) printf("Token: LEFT_BRACE %s\n", yytext);
                                                         return(LEFT_BRACE);
@@ -1053,7 +1057,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 164 "src/scanner.l"
+#line 168 "src/scanner.l"
 {
                                                         if (DEBUG) printf("Token: RIGHT_BRACE %s\n", yytext);
                                                         return(RIGHT_BRACE);
@@ -1061,7 +1065,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 169 "src/scanner.l"
+#line 173 "src/scanner.l"
 {
                                                         if (DEBUG) printf("Token: MULTIPLY_TOKEN %s\n", yytext);
                                                         return(MULTIPLY_TOKEN);
@@ -1069,7 +1073,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 174 "src/scanner.l"
+#line 178 "src/scanner.l"
 {
                                                         if (DEBUG) printf("Token: DIVIDE_TOKEN %s\n", yytext);
                                                         return(DIVIDE_TOKEN);
@@ -1077,7 +1081,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 179 "src/scanner.l"
+#line 183 "src/scanner.l"
 {
                                                         if (DEBUG) printf("Token: MINUS_TOKEN %s\n", yytext);
                                                         return(MINUS_TOKEN);
@@ -1085,7 +1089,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 184 "src/scanner.l"
+#line 188 "src/scanner.l"
 {
                                                         if (DEBUG) printf("Token: ADD_TOKEN %s\n", yytext);
                                                         return(PLUS_TOKEN);
@@ -1093,7 +1097,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 189 "src/scanner.l"
+#line 193 "src/scanner.l"
 {
                                                         if (DEBUG) printf("Token: MODULUS_TOKEN %s\n", yytext);
                                                         return(MODULUS_TOKEN);
@@ -1101,7 +1105,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 194 "src/scanner.l"
+#line 198 "src/scanner.l"
 {
                                                         if (DEBUG) printf("Token: LESS_THAN_TOKEN %s\n", yytext);
                                                         return(LESS_THAN_TOKEN);
@@ -1109,7 +1113,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 199 "src/scanner.l"
+#line 203 "src/scanner.l"
 {
                                                         if (DEBUG) printf("Token: LESS_THAN_EQUAL_TOKEN %s\n", yytext);
                                                         return(LESS_THAN_EQUAL_TOKEN);
@@ -1117,7 +1121,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 204 "src/scanner.l"
+#line 208 "src/scanner.l"
 {
                                                         if (DEBUG) printf("Token: GRT_THAN_TOKEN %s\n", yytext);
                                                         return(GRT_THAN_TOKEN);
@@ -1125,7 +1129,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 209 "src/scanner.l"
+#line 213 "src/scanner.l"
 {
                                                         if (DEBUG) printf("Token: GRT_THAN_EQUAL_TOKEN %s\n", yytext);
                                                         return(GRT_THAN_EQUAL_TOKEN);
@@ -1133,7 +1137,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 214 "src/scanner.l"
+#line 218 "src/scanner.l"
 {
                                                         if (DEBUG) printf("Token: EQUAL_TOKEN %s\n", yytext);
                                                         return(EQUAL_TOKEN);
@@ -1141,7 +1145,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 219 "src/scanner.l"
+#line 223 "src/scanner.l"
 {
                                                         if (DEBUG) printf("Token: NOT_EQUAL_TOKEN %s\n", yytext);
                                                         return(NOT_EQUAL_TOKEN);
@@ -1149,7 +1153,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 224 "src/scanner.l"
+#line 228 "src/scanner.l"
 {
                                                         if (DEBUG) printf("Token: AND_TOKEN %s\n", yytext);
                                                         return(AND_TOKEN);
@@ -1157,7 +1161,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 229 "src/scanner.l"
+#line 233 "src/scanner.l"
 {
                                                         if (DEBUG) printf("Token: OR_TOKEN %s\n", yytext);
                                                         return(OR_TOKEN);
@@ -1165,7 +1169,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 234 "src/scanner.l"
+#line 238 "src/scanner.l"
 {
                                                         if (DEBUG) printf("Token: NOT_TOKEN %s\n", yytext);
                                                         return(NOT_TOKEN);
@@ -1173,7 +1177,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 239 "src/scanner.l"
+#line 243 "src/scanner.l"
 {
                                                         if (DEBUG) printf("Token: ASSIGN_TOKEN %s\n", yytext);
                                                         return(ASSIGN_TOKEN);
@@ -1181,14 +1185,14 @@ YY_RULE_SETUP
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 244 "src/scanner.l"
+#line 248 "src/scanner.l"
 {
                                                         if (DEBUG) printf("Token: COMMENT  %s\n", yytext);
                                                     }
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 248 "src/scanner.l"
+#line 252 "src/scanner.l"
 {
                                                         if (DEBUG) printf("Token: REAL_NUMBER  %s\n", yytext);
                                                         char* pend;
@@ -1198,7 +1202,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 255 "src/scanner.l"
+#line 259 "src/scanner.l"
 {
                                                         if (DEBUG) printf("Token: INTEGER  %s\n", yytext);
                                                         yylval.helper.ival = atoi(yytext);
@@ -1207,7 +1211,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 261 "src/scanner.l"
+#line 265 "src/scanner.l"
 {
                                                         if (DEBUG) printf("Token: VARIABLE  %s\n", yytext);
                                                         yylval.helper.sval = strdup(yytext);
@@ -1217,7 +1221,7 @@ YY_RULE_SETUP
 case 49:
 /* rule 49 can match eol */
 YY_RULE_SETUP
-#line 267 "src/scanner.l"
+#line 271 "src/scanner.l"
 {
                                                         if (DEBUG) printf("Token: STRING  %s\n", yytext);
                                                         yylval.helper.sval = strdup(yytext);
@@ -1227,7 +1231,7 @@ YY_RULE_SETUP
 case 50:
 /* rule 50 can match eol */
 YY_RULE_SETUP
-#line 273 "src/scanner.l"
+#line 277 "src/scanner.l"
 {
                                                         if (DEBUG) printf("Newline\n");
                                                         incrementLinePointer();
@@ -1237,17 +1241,17 @@ YY_RULE_SETUP
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 280 "src/scanner.l"
+#line 284 "src/scanner.l"
 {
                                                         if (DEBUG) printf("Trash: %s", yytext);
                                                     }
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 283 "src/scanner.l"
+#line 287 "src/scanner.l"
 ECHO;
 	YY_BREAK
-#line 1250 "src/generated/lex.yy.c"
+#line 1254 "src/generated/lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2252,5 +2256,5 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 283 "src/scanner.l"
+#line 287 "src/scanner.l"
 

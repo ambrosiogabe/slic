@@ -106,6 +106,7 @@ static void init(int argc, char** argv) {
 	currentLineNumber = 1;
 	beginningOfCurrentLine = sourceCode;
 	currentColumn = 0;
+	errorOccurred = 0;
 	incrementLinePointer();
 }
 
@@ -135,7 +136,6 @@ int main(int argc, char** argv)
 		return -1;
 	}
 
-	printSymbolTable();
 	// Walk syntax tree and generate code
 	walkSyntaxTree();
 

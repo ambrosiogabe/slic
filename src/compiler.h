@@ -6,7 +6,6 @@
 /*
 /* Author: Gabe ambrosio
 /* ============================================================== */
-
 #include "abstractSyntaxTree.h"
 
 typedef enum {
@@ -21,6 +20,9 @@ typedef struct {
     int hasOperand;
     int operandIsFloat;
     InstructionType type;
+    char* funcName;
+    int numOfArguments;
+    int tokenIndex;
     union {
         float fval;
         int   ival;

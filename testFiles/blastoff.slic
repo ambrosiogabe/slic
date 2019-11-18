@@ -10,19 +10,4 @@ main;
          print count, !;
       end counting;
       print "Blast off!", !, !;
-
-      count := fun(a, b);
 end main;
-
-
-fun;
-   parameter:
-      integer: a;
-      integer: b;
-   data:
-      integer: a;
-      real: b;
-   algorithm:
-      a := b - 10;
-      return a;
-end fun;

@@ -1,6 +1,5 @@
 #ifndef SLIC_COMMON_H
 #define SLIC_COMMON_H
-
 /*=================================================================
 /* This file contains all the code necessary for error tracking.
 /* It also contains a table with tokens, that point to the 
@@ -79,5 +78,8 @@ int yyerrorInfo(const char* s, TokenInformation token);
 
 #define AS_ASSIGN_STMT(node) (node->as.assignStmt)
 #define AS_VARIABLE(node)    (node->as.variable)
+
+int beginFunctionCallLine;
+int errorOccurred;
 
 #endif

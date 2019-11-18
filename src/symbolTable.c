@@ -40,6 +40,7 @@ static SymbolTableEntry makeSymbol(DataType type, char* name, DataStructure stru
     entry.address = functionSymbolTable->nextAddress;
     entry.structure = structure;
     entry.size = size;
+    entry.isParameter = 0;
     entry.hashValue = hashVariableName(name);
     functionSymbolTable->nextAddress += size;
 
@@ -57,6 +58,50 @@ void insertSymbolTable(DataType type, char* name, DataStructure structure, uint1
     functionSymbolTable->size++;
 }
 
+void insertParameterSymbolTable(DataType type, char* name, DataStructure structure, uint16_t size) {
+    SymbolTableEntry entry = makeSymbol(type, name, structure, size);
+    entry.isParameter = 1;
+    if (functionSymbolTable->size + 1 >= functionSymbolTable->capacity) {
+        functionSymbolTable->capacity *= 2;
+        functionSymbolTable->symbols = realloc(functionSymbolTable->symbols, functionSymbolTable->capacity * sizeof(SymbolTableEntry));
+    }
+
+    functionSymbolTable->symbols[functionSymbolTable->size] = entry;
+    functionSymbolTable->size++;
+}
+
+int getParameterLength(char* name) {
+    FunctionSymbolTable* symbolTable = getFunctionSymbol(name);
+    int length = 0;
+    for (int i=0; i < symbolTable->size; i++) {
+        if (symbolTable->symbols[i].isParameter == 1) length++;
+    }
+    return length;
+}
+
+int getVariableLength(char* name) {
+    FunctionSymbolTable* symbolTable = getFunctionSymbol(name);
+    int length = 0;
+    for (int i=0; i < symbolTable->size; i++) {
+        if (symbolTable->symbols[i].isParameter == 0) length++;
+    }
+    return length;
+}
+
+void setFunctionSymbolLine(char* funcName, int line) {
+    FunctionSymbolTable* symbolTable = getFunctionSymbol(funcName);
+    symbolTable->functionLine = line;
+}
+
+int getFunctionSymbolLine(char* funcName) {
+   int ret = getFunctionSymbol(funcName)->functionLine;
+   return ret;
+}
+
+void functionReturnsSymbol(char* funcName) {
+    getFunctionSymbol(funcName)->returnsAValue = 1;
+}
+
 static FunctionSymbolTable* makeFunctionSymbol(char* name) {
     FunctionSymbolTable* table = malloc(sizeof(FunctionSymbolTable));
     table->capacity = 8;
@@ -64,6 +109,7 @@ static FunctionSymbolTable* makeFunctionSymbol(char* name) {
     table->nextAddress = 0;
     table->symbols = malloc(table->capacity * sizeof(SymbolTableEntry));
     table->functionName = name;
+    table->returnsAValue = 0;
     table->hashValue = hashVariableName(name);
     return table;
 }
@@ -120,8 +166,8 @@ void printSymbolTable() {
     for (int i=0; i < symbolTable.size; i++) {
         currentTable = symbolTable.functionSymbols[i];
         printf("%s\n", currentTable->functionName);
-        printf("|%11s|%11s|%11s|%11s|%11s|\n", "Type", "Name", "Address", "Size", "Structure");
-        for (int i=0; i < 61; i++) printf("=");
+        printf("|%11s|%11s|%11s|%11s|%11s|%11s|\n", "Type", "Name", "Address", "Size", "Structure", "Param");
+        for (int i=0; i < 73; i++) printf("=");
             printf("\n");
 
         for (int i=0; i < currentTable->size; i++) {
@@ -129,8 +175,8 @@ void printSymbolTable() {
             char* type = entry.type == INT ? "integer" : "real";
             char* structure = entry.structure == SCALAR ? "scalar" : "array"; 
 
-            printf("|%11s|%11s|%11d|%11d|%11s|\n", type, entry.name, entry.address, entry.size, structure);
-            for (int i=0; i < 61; i++) printf("-");
+            printf("|%11s|%11s|%11d|%11d|%11s|%11d|\n", type, entry.name, entry.address, entry.size, structure, entry.isParameter);
+            for (int i=0; i < 73; i++) printf("-");
                 printf("\n");
         }
         

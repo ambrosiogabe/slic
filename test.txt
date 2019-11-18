@@ -1,28 +1,24 @@
 main;
    data:
-      integer: count;
-      integer: endit;
+      integer: a;
+      integer: b[10];
    algorithm:
-      print !;
-      endit := 0;
-      counting count downward 10 to endit;
-         endit := -4;
-         print count, !;
-      end counting;
-      print "Blast off!", !, !;
-
-      #count := fun(a, b);
+      a := 2;
+      while a <> -1;
+         print "Enter a number: ";
+         read a;
+         print !, factorial(a), !;
+      end while;
 end main;
 
-
-fun;
+factorial;
    parameter:
-      integer: ad;
-      integer: bd;
-   data:
       integer: a;
-      real: b;
+   data:
    algorithm:
-      a := b - 10;
-      #return a;
-end fun;
+      if a <= 0;
+         return 1;
+      end if;
+
+      return factorial(a - 1) * a;
+end factorial;

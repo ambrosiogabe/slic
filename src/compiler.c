@@ -12,10 +12,18 @@
 
 #include "compiler.h"
 
+int functionVarIspLine;
+int inFunction;
+int beginFunctionLine;
+int inFunctionCall;
+
 /* ==============================================================
 /* Instruction container inserter deleter etc
 /* ============================================================== */
 void initInstructionContainer() {
+    beginFunctionLine = -1;
+    functionVarIspLine = -1;
+    inFunction = 0;
     instructions.capacity = 8;
     instructions.size = 0;
     instructions.instructions = malloc(sizeof(Instruction) * 8);
@@ -70,6 +78,47 @@ void insertEmptyInstruction(InstructionType type) {
 static void walkNode(AstNode* node);
 static void walkVariableNode(AstNode* node, int loadVal);
 static void generateCode();
+
+static void walkFunctionCall(AstNode* node) {
+    inFunctionCall = 1;
+    AstNode* previous = NULL;
+    AstNode* current = node->as.functionCall->variableList;
+    int numOfArguments = 0;
+
+    // Reverse singly linked list order
+    while (current != NULL) {
+        AstNode* tmp = current->next;
+        current->next = previous;
+        previous = current;
+        if (tmp != NULL) 
+            current = tmp;
+        else 
+            break;
+    }
+    node->as.functionCall->variableList = current;
+    
+    // Now walk the nodes so that they get pushed on the 
+    // stack in the appropriate order
+    insertIntInstruction(ISP, -2);
+    instructions.instructions[instructions.size - 1].funcName = node->as.functionCall->funcName;
+    instructions.instructions[instructions.size - 1].tokenIndex = node->tokenInfoIndex;
+
+    while (current != NULL) {
+        walkNode(current);
+        current = current->next;
+        numOfArguments++;
+    }
+    node->as.functionCall->numOfArguments = numOfArguments;
+
+    insertIntInstruction(CAL, -1);
+    instructions.instructions[instructions.size - 1].funcName = node->as.functionCall->funcName;
+    instructions.instructions[instructions.size - 1].numOfArguments = numOfArguments;
+    instructions.instructions[instructions.size - 1].tokenIndex = node->tokenInfoIndex;
+    insertIntInstruction(DSP, -1);
+    instructions.instructions[instructions.size - 1].funcName = node->as.functionCall->funcName;
+    instructions.instructions[instructions.size - 1].tokenIndex = node->tokenInfoIndex;
+    inFunctionCall = 0;
+}
 
 static void walkCountingLoop(AstNode* node) {
     // Initialize the variable to start expression
@@ -230,7 +279,17 @@ static void walkNewlineNode(AstNode* node) {
 }
 
 static void walkVariableNode(AstNode* node, int loadVal) {
-    insertIntInstruction(LAA, node->as.variable.address);
+    if (inFunctionCall && node->as.variable.structure == ARRAY) {
+        yyerrorInfo("Cannot pass array as an argument to a function!", tokenTable.table[node->tokenInfoIndex]);
+    }
+
+    if (node->as.variable.isParameter)
+        insertIntInstruction(PAR, node->as.variable.address + 1);
+    else if (!inFunction)
+        insertIntInstruction(LAA, node->as.variable.address);
+    else 
+        insertIntInstruction(LRA, node->as.variable.address + 2);
+
     if (loadVal)
         insertEmptyInstruction(LOD);
 }
@@ -332,7 +391,7 @@ static void walkExprNode(AstNode* node) {
             node->isFloaty = 0;
             break;
         }
-        default:                  yyerrorInfo("Error: Unknown binary operator!", tokenTable.table[node->tokenInfoIndex]); exit(-1);
+        default:                  yyerrorInfo("Error: Unknown binary operator!", tokenTable.table[node->tokenInfoIndex]);
     }
 }
 
@@ -355,6 +414,7 @@ static void walkPrintListNode(AstNode* node) {
 /* Initialization function
 /* ============================================================== */
 void initSyntaxTree() {
+    inFunctionCall = 0;
     astRootNode = NULL;
 }
 
@@ -442,6 +502,33 @@ static void walkNode(AstNode* node) {
         case EXIT_NODE:
             insertEmptyInstruction(HLT);
             break;
+        case FUNCTION_NODE:
+            inFunction = 1;
+            beginFunctionLine = instructions.size;
+            functionVarIspLine = instructions.size;
+            insertIntInstruction(ISP, -1);
+            break;
+        case END_OF_FUNCTION_NODE:
+            inFunction = 0;
+            setFunctionSymbolLine(node->as.endOfFunction->funcName, beginFunctionLine);
+            int parameterLength = getParameterLength(node->as.endOfFunction->funcName);
+            int variableLength = getVariableLength(node->as.endOfFunction->funcName);
+            instructions.instructions[functionVarIspLine].operand.ival = variableLength;
+            insertEmptyInstruction(RET);
+            break;
+        case FUNCTION_CALL_NODE:
+            walkFunctionCall(node);
+            break;
+        case RETURN_NODE:
+            if (strcmp(node->as.returnNode->funcName, "main") == 0) {
+                yyerrorInfo("Main function cannot return value!", tokenTable.table[node->tokenInfoIndex]);
+            }
+            functionReturnsSymbol(node->as.returnNode->funcName);
+            insertIntInstruction(PAR, getParameterLength(node->as.returnNode->funcName) + 1);
+            walkNode(node->as.returnNode->expr);
+            insertEmptyInstruction(STO);
+            insertEmptyInstruction(RET);
+            break;
         default:
             printf("Do not know how to walk this! %d", node->type);
             exit(-1);
@@ -450,6 +537,34 @@ static void walkNode(AstNode* node) {
 
 void freeInstructionContainer() {
     free(instructions.instructions);
+}
+
+static void patchFunctions() {
+    for (int i=0; i < instructions.size; i++) {
+        Instruction instr = instructions.instructions[i];
+        if (instr.type == CAL || (instr.type == DSP && instr.operand.ival == -1) || (instr.type == ISP && instr.operand.ival == -2)) {
+            if (getFunctionSymbol(instr.funcName) == NULL) {
+                yyerrorInfo("Undefined function!", tokenTable.table[instr.tokenIndex]);
+                continue;
+            }
+        }
+
+        if (instr.type == CAL) {
+            instructions.instructions[i].operand.ival = getFunctionSymbolLine(instr.funcName);
+            if (getParameterLength(instructions.instructions[i].funcName) > instructions.instructions[i].numOfArguments) {
+                yyerrorInfo("Not enough arguments for function!", tokenTable.table[instructions.instructions[i].tokenIndex]);
+            } else if (getParameterLength(instructions.instructions[i].funcName) < instructions.instructions[i].numOfArguments) {
+                yyerrorInfo("Too many arguments for function!", tokenTable.table[instructions.instructions[i].tokenIndex]);
+            }
+        } else if (instr.type == DSP && instr.operand.ival == -1) {
+            instructions.instructions[i].operand.ival = getParameterLength(instr.funcName);
+        } else if (instr.type == ISP && instr.operand.ival == -2) {
+            if (getFunctionSymbol(instr.funcName)->returnsAValue == 1) 
+                instructions.instructions[i].operand.ival = 1;
+            else 
+                instructions.instructions[i].operand.ival = 0;
+        }
+    }
 }
 
 // Helper function found on stack overflow to strip extension 
@@ -468,6 +583,11 @@ static void strip_ext(char *fname)
 }
 
 static void generateCode() {
+    patchFunctions();
+    if (errorOccurred) {
+        exit(-1);
+    }
+
     FILE* fp;
     if (filename != NULL) {
         char* dupFilename = strdup(filename);

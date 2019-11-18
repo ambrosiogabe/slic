@@ -7,8 +7,6 @@
 /* Implementation: abstractSyntaxTree.c
 /* Author: Gabe Ambrosio
 /* =========================================================== */
-
-
 #include <stdlib.h>
 #include <stdio.h>
 #include "symbolTable.h"
@@ -37,6 +35,10 @@ typedef enum {
     READ_NODE,
     READ_ARRAY_NODE,
     EXIT_NODE,
+    END_OF_FUNCTION_NODE,
+    FUNCTION_NODE,
+    FUNCTION_CALL_NODE,
+    RETURN_NODE,
 } NodeType;
 
 /* ===========================================================================
@@ -195,6 +197,16 @@ typedef struct {
 } WhileLoop;
 
 typedef struct {
+    char* funcName;
+} EndOfFunctionNode;
+
+typedef struct {
+    char* funcName;
+    AstNode* variableList;
+    int numOfArguments;
+} FunctionCallNode;
+
+typedef struct {
     AstNode* variable;
     AstNode* synthesizedIncrement;
     AstNode* synthesizedCheckExpr;
@@ -207,6 +219,11 @@ typedef struct {
     AstNode* variable;
     AstNode* expr;
 } ReadArrayNode;
+
+typedef struct {
+    AstNode* expr;
+    char* funcName;
+} ReturnNode;
 
 /* ===========================================================================
 /* The AstNode is the "parent" class of all other node subclasses. The node
@@ -236,6 +253,9 @@ struct AstNode {
         WhileLoop* whileLoop;
         CountingLoop* countingLoop;
         ReadArrayNode* readArrayNode;
+        EndOfFunctionNode* endOfFunction;
+        FunctionCallNode* functionCall;
+        ReturnNode* returnNode;
         char* string;
     } as; 
     AstNode* next;
@@ -250,7 +270,9 @@ struct AstNode {
 #define IS_UNARY_EXPR_NODE(value)  ((value).type == UNARY_EXPR_NODE)
 #define IS_EXPR_NODE(value)        ((value).type == EXPR_NODE || IS_UNARY_EXPR_NODE(value))
 #define IS_ARRAY_LOAD_NODE(value)  ((value).type == ARRAY_LOAD_NODE)
-#define IS_TYPE_OF_EXPR(value)     ((value).type == EXPR_NODE || IS_VAL_NODE(value) || IS_VARIABLE_NODE(value) || IS_UNARY_EXPR_NODE(value) || IS_ARRAY_LOAD_NODE(value))
+#define IS_FUNCTION_CALL(value)    ((value).type == FUNCTION_CALL_NODE)
+#define IS_TYPE_OF_EXPR(value)     ((value).type == EXPR_NODE || IS_VAL_NODE(value) || IS_VARIABLE_NODE(value) || IS_UNARY_EXPR_NODE(value) || IS_ARRAY_LOAD_NODE(value) \
+                                    || IS_FUNCTION_CALL(value))
 
 /* ===========================================================================
 /* Helper functions to make specific nodes for the abstract syntax tree.
@@ -274,6 +296,10 @@ AstNode* makeCountingLoopNode(int tokenInfoIndex, AstNode* variable, int isUpwar
 AstNode* makeReadArrayNode(int tokenInfoIndex, char* name, AstNode* expr);
 AstNode* makeReadNode(int tokenInfoIndex, char* name);
 AstNode* makeExitNode(int tokenInfoIndex);
+AstNode* makeFunctionNode(int tokenInfoIndex);
+AstNode* makeEndOfFunctionNode(int tokenInfoIndex, char* funcName);
+AstNode* makeFunctionCallNode(int tokenInfoIndex, char* funcName, AstNode* variableList);
+AstNode* makeReturnNode(int tokenInfoIndex, AstNode* expr, char* funcName);
 
 /* ===========================================================================
 /* A function to free all the memory used for the AST.
