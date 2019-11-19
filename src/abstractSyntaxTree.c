@@ -278,6 +278,7 @@ AstNode* makeArrayLoadNode(int tokenInfoIndex, char* name, AstNode* indexExpr) {
     newNode->as.arrayLoad->symEntry = symEntry;
     newNode->as.arrayLoad->indexExpr = indexExpr;
 
+    free(name);
     return newNode;
 }
 

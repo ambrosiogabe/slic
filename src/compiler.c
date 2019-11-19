@@ -592,6 +592,7 @@ static void generateCode() {
     if (filename != NULL) {
         char* dupFilename = strdup(filename);
         strip_ext(dupFilename);
+        dupFilename = realloc(dupFilename, sizeof(dupFilename) * (strlen(dupFilename) + 6));
         strcat(dupFilename, ".gstal");
         fp = fopen(dupFilename, "w+");
         free(dupFilename);
