@@ -3,9 +3,9 @@ main;
       integer: a;
       integer: b[10];
    algorithm:
-      a := 2;
+      a := 0;
       while a <> -1;
-         print "Enter a number: ";
+         print "Enter a number (Enter -1 to quit): ";
          read a;
          print !, factorial(a), !;
       end while;

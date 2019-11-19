@@ -1,0 +1,30 @@
+main;
+    data:
+        integer: userIn;
+    
+    algorithm:
+        userIn := 0;
+        while userIn <> -1;
+            print "Enter a number (Enter -1 to quit): ";
+            read userIn;
+            print !, "Fibonacci(", userIn, ") = ", fibonacci(userIn), !;
+        end while;
+
+end main;
+
+fibonacci;
+    parameter:
+        integer: x;
+    data:
+    algorithm:
+        if x <= 0;
+            return 1;
+        end if;
+
+        if x = 1;
+            return 1;
+        end if;
+
+        return fibonacci(x - 1) + fibonacci(x - 2);
+
+end fibonacci;
